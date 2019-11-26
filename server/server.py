@@ -2,6 +2,7 @@ import socket
 import struct
 import time
 import thread
+from crccheck.crc import Crc12Cdma2000
 
 from nc_config import *
 
@@ -25,23 +26,30 @@ for i in range(2, 3002, 3):
     key_header = line[0]
     key_body = line[1:]
     val = lines[i + 1].split()
-    
+    key_hash = Crc12Cdma2000.calc(key_body)
+
     key_header = int(key_header)
     for i in range(len(key_body)):
         key_body[i] = int(key_body[i], 16)
     for i in range(len(val)):
         val[i] = int(val[i], 16)
-    
+
+    packed_header = struct.pack(">I", key_header)
+
+    hash_field = ""
+    hash_field += packed_header
+    hash_field += struct.pack(">I", key_hash)
+
     key_field = ""
-    key_field += struct.pack(">I", key_header)
+    key_field += packed_header
     for i in range(len(key_body)):
         key_field += struct.pack("B", key_body[i])
-    
+
     val_field = ""
     for i in range(len(val)):
         val_field += struct.pack("B", val[i])
-    
-    kv[key_header] = (key_field, val_field)
+
+    kv[key_header] = (hash_field, key_field, val_field)
 f.close()
 
 counter = 0
@@ -60,24 +68,30 @@ while True:
     packet, addr = s.recvfrom(2048)
     op_field = packet[0]
     key_field = packet[1:]
-    
+
     op = struct.unpack("B", op_field)[0]
     key_header = struct.unpack(">I", key_field[:4])[0]
-    
+
     if (op == NC_READ_REQUEST or op == NC_HOT_READ_REQUEST):
         op = NC_READ_REPLY
         op_field = struct.pack("B", op)
-        key_field, val_field = kv[key_header]
-        packet = op_field + key_field + val_field
+        hash_field, key_field, val_field = kv[key_header]
+        packet = op_field + hash_field + val_field
         s.sendto(packet, (CLIENT_IP, NC_PORT))
         counter = counter + 1
     elif (op == NC_UPDATE_REQUEST):
         op = NC_UPDATE_REPLY
         op_field = struct.pack("B", op)
-        key_field, val_field = kv[key_header]
-        packet = op_field + key_field + val_field
+        hash_field, key_field, val_field = kv[key_header]
+        packet = op_field + hash_field + val_field
         s.sendto(packet, (CONTROLLER_IP, NC_PORT))
-    
+
+        op = NC_UPDATE_KEY_REPLY
+        op_field = struct.pack("B", op)
+        hash_field, key_field, val_field = kv[key_header]
+        packet = op_field + hash_field + key_field
+        s.sendto(packet, (CONTROLLER_IP, NC_PORT))
+
     #f.write(str(op) + ' ')
     #f.write(str(key_header) + '\n')
     #f.flush()
