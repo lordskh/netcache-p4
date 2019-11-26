@@ -2,7 +2,7 @@ import socket
 import struct
 import time
 import thread
-from crccheck.crc import Crc12Cdma2000
+import crc16
 
 from nc_config import *
 
@@ -26,7 +26,7 @@ for i in range(2, 3002, 3):
     key_header = line[0]
     key_body = line[1:]
     val = lines[i + 1].split()
-    key_hash = Crc12Cdma2000.calc(key_body)
+    key_hash = crc16.crc16xmodem(lines[i])
 
     key_header = int(key_header)
     for i in range(len(key_body)):
@@ -34,14 +34,10 @@ for i in range(2, 3002, 3):
     for i in range(len(val)):
         val[i] = int(val[i], 16)
 
-    packed_header = struct.pack(">I", key_header)
-
-    hash_field = ""
-    hash_field += packed_header
-    hash_field += struct.pack(">I", key_hash)
+    hash_field = struct.pack(">I", key_hash)
 
     key_field = ""
-    key_field += packed_header
+    key_field += struct.pack(">I", key_header)
     for i in range(len(key_body)):
         key_field += struct.pack("B", key_body[i])
 
