@@ -26,7 +26,6 @@ for i in range(2, 3002, 3):
     key_header = line[0]
     key_body = line[1:]
     val = lines[i + 1].split()
-    key_hash = crc16.crc16xmodem(lines[i])
 
     key_header = int(key_header)
     for i in range(len(key_body)):
@@ -34,13 +33,14 @@ for i in range(2, 3002, 3):
     for i in range(len(val)):
         val[i] = int(val[i], 16)
 
-    hash_field = struct.pack(">I", key_hash)
-
     key_field = ""
     key_field += struct.pack(">I", key_header)
     for i in range(len(key_body)):
         key_field += struct.pack("B", key_body[i])
 
+    key_hash = crc16.crc16xmodem(key_field)
+    hash_field = struct.pack(">I", key_hash)
+    
     val_field = ""
     for i in range(len(val)):
         val_field += struct.pack("B", val[i])
@@ -63,7 +63,7 @@ s.bind((SERVER_IP, NC_PORT))
 while True:
     packet, addr = s.recvfrom(2048)
     op_field = packet[0]
-    key_field = packet[1:]
+    key_field = packet[17:]
 
     op = struct.unpack("B", op_field)[0]
     key_header = struct.unpack(">I", key_field[:4])[0]
