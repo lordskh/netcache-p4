@@ -9,13 +9,13 @@ metadata nc_cache_md_t nc_cache_md;
 
 header_type nc_hash_key_t {
     fields {
-        hash_key: 16;
+        hash_key: 4;
     }
 }
 metadata nc_hash_key_t nc_hash_key;
 
 field_list hk_hash_fields {
-    current(0, 1024);
+    current(0, nc_hdr);
 }
 field_list_calculation key_hash {
     input {

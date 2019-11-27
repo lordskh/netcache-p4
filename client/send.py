@@ -33,13 +33,11 @@ for line in f.readlines():
     key_body = line[2:]
 
     op_field = struct.pack("B", NC_READ_REQUEST)
-    fake_field = ""
-    for i in range(len_key):
-        fake_field += struct.pack("B", 0)
+    len_field += struct.pack(">I", (4 + len(key_body))*8)
     key_field = struct.pack(">I", key_header)
     for i in range(len(key_body)):
         key_field += struct.pack("B", int(key_body[i], 16))
-    packet = op_field + fake_field + key_field
+    packet = op_field + len_field + key_field
 
     s.sendto(packet, (SERVER_IP, NC_PORT))
     counter = counter + 1
