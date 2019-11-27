@@ -38,7 +38,7 @@ header_type tcp_t {
         window : 16;
         checksum : 16;
         urgentPtr : 16;
-    }   
+    }
 }
 header tcp_t tcp;
 
@@ -55,7 +55,7 @@ header udp_t udp;
 header_type nc_hdr_t {
     fields {
         op: 8;
-        key: 128;
+        key: 32;
     }
 }
 header nc_hdr_t nc_hdr;
