@@ -12,7 +12,7 @@ CONTROLLER_IP = "10.0.0.3"
 path_query = "query.txt"
 query_rate = 1000
 
-len_key = 16
+len_key = 4
 
 counter = 0
 def counting():
@@ -34,7 +34,7 @@ for line in f.readlines():
 
     op_field = struct.pack("B", NC_READ_REQUEST)
     fake_field = ""
-    for i in range(16):
+    for i in range(len_key):
         fake_field += struct.pack("B", 0)
     key_field = struct.pack(">I", key_header)
     for i in range(len(key_body)):

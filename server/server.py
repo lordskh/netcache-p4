@@ -63,7 +63,7 @@ s.bind((SERVER_IP, NC_PORT))
 while True:
     packet, addr = s.recvfrom(2048)
     op_field = packet[0]
-    key_field = packet[17:]
+    key_field = packet[5:]
 
     op = struct.unpack("B", op_field)[0]
     key_header = struct.unpack(">I", key_field[:4])[0]
