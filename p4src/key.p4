@@ -108,19 +108,15 @@
         extract(nc_load)
         if(nc_load.load_1 != (nc_key_##i.key_##i##_1) {
             modify_field (nc_cache_md.cache_valid, 0);
-            modify_field (nc_cache_md.cache_exist, 0);
         }
         else if(nc_load.load_2 != (nc_key_##i.key_##i##_2) {
             modify_field (nc_cache_md.cache_valid, 0);
-            modify_field (nc_cache_md.cache_exist, 0);
         }
         else if(nc_load.load_3 != (nc_key_##i.key_##i##_3) {
             modify_field (nc_cache_md.cache_valid, 0);
-            modify_field (nc_cache_md.cache_exist, 0);
         }
         else if(nc_load.load_4 != (nc_key_##i.key_##i##_4) {
             modify_field (nc_cache_md.cache_valid, 0);
-            modify_field (nc_cache_md.cache_exist, 0);
         }
     }
 
@@ -134,15 +130,6 @@
 #define CONTROL_PROCESS_KEY(i) \
     control process_key_##i { \
         if (nc_hdr.op == NC_READ_REQUEST and nc_cache_md.cache_valid == 1) { \
-            apply (add_key_header_##i); \
-            apply (read_key_##i##_1); \
-            apply (read_key_##i##_2); \
-            apply (read_key_##i##_3); \
-            apply (read_key_##i##_4); \
-            apply (check_collision_##i); \
-            apply (remove_key_header_##i); \
-        } \
-        else if (nc_hdr.op == NC_UPDATE_REPLY and nc_cache_md.cache_exist == 1) { \
             apply (add_key_header_##i); \
             apply (read_key_##i##_1); \
             apply (read_key_##i##_2); \
