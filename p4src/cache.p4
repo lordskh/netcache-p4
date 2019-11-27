@@ -15,7 +15,7 @@ header_type nc_hash_key_t {
 metadata nc_hash_key_t nc_hash_key;
 
 field_list hk_hash_fields {
-    current(0, nc_hdr);
+    nc_hdr.key;
 }
 field_list_calculation key_hash {
     input {

@@ -55,8 +55,11 @@ header udp_t udp;
 header_type nc_hdr_t {
     fields {
         op: 8;
-        key: 32;
+        key_len: 32;
+        key: *;
     }
+    length = 5 + key_len
+    max_length = 133
 }
 header nc_hdr_t nc_hdr;
 

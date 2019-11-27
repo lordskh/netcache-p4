@@ -1,4 +1,4 @@
-parser start {
+ parser start {
     return parse_ethernet;
 }
 

@@ -76,16 +76,16 @@ while True:
         s.sendto(packet, (CLIENT_IP, NC_PORT))
         counter = counter + 1
     elif (op == NC_UPDATE_REQUEST):
-        op = NC_UPDATE_REPLY
-        op_field = struct.pack("B", op)
-        hash_field, key_field, val_field = kv[key_header]
-        packet = op_field + hash_field + val_field
-        s.sendto(packet, (CONTROLLER_IP, NC_PORT))
-
         op = NC_UPDATE_KEY_REPLY
         op_field = struct.pack("B", op)
         hash_field, key_field, val_field = kv[key_header]
         packet = op_field + hash_field + key_field
+        s.sendto(packet, (CONTROLLER_IP, NC_PORT))
+        
+        op = NC_UPDATE_REPLY
+        op_field = struct.pack("B", op)
+        hash_field, key_field, val_field = kv[key_header]
+        packet = op_field + hash_field + val_field
         s.sendto(packet, (CONTROLLER_IP, NC_PORT))
 
     #f.write(str(op) + ' ')
