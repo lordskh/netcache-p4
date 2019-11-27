@@ -21,8 +21,8 @@ field_list_calculation key_hash {
     input {
         hk_hash_fields;
     }
-    algorithm : crc16;
-    output_width : 16;
+    algorithm : crc32;
+    output_width : 32;
 }
 
 action get_hash_key_act {

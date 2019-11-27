@@ -2,7 +2,7 @@ import socket
 import struct
 import time
 import thread
-import crc16
+import binascii
 
 from nc_config import *
 
@@ -38,9 +38,9 @@ for i in range(2, 3002, 3):
     for i in range(len(key_body)):
         key_field += struct.pack("B", key_body[i])
 
-    key_hash = crc16.crc16xmodem(key_field)
+    key_hash = binascii.crc32(key_field) % (1<<32)
     hash_field = struct.pack(">I", key_hash)
-    
+
     val_field = ""
     for i in range(len(val)):
         val_field += struct.pack("B", val[i])
