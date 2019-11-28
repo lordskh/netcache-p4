@@ -1144,7 +1144,6 @@
                 "ipv4",
                 "udp",
                 "nc_hdr",
-                "nc_load",
                 "nc_value_1",
                 "nc_value_2",
                 "nc_value_3",
@@ -1153,6 +1152,7 @@
                 "nc_value_6",
                 "nc_value_7",
                 "nc_value_8",
+                "nc_load",
                 "tcp"
             ]
         }
@@ -1160,8 +1160,186 @@
     "meter_arrays": [],
     "actions": [
         {
-            "name": "add_value_header_2_act",
+            "name": "hh_bf_2_act",
             "id": 0,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "modify_field_with_hash_based_offset",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "index_2"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x0"
+                        },
+                        {
+                            "type": "calculation",
+                            "value": "hh_bf_2_hash"
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x200"
+                        }
+                    ]
+                },
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "bf_2"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "hh_bf_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "index_2"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "hh_bf_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "index_2"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x1"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "set_egress",
+            "id": 1,
+            "runtime_data": [
+                {
+                    "name": "egress_spec",
+                    "bitwidth": 9
+                }
+            ],
+            "primitives": [
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "standard_metadata",
+                                "egress_spec"
+                            ]
+                        },
+                        {
+                            "type": "runtime_data",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "op": "add_to_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "ttl"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "-0x1"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_8_1_act",
+            "id": 2,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_8",
+                                "value_8_1"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_8_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_8_2_act",
+            "id": 3,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_8",
+                                "value_8_2"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_8_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "add_value_header_3_act",
+            "id": 4,
             "runtime_data": [],
             "primitives": [
                 {
@@ -1201,105 +1379,45 @@
                     "parameters": [
                         {
                             "type": "header",
-                            "value": "nc_value_2"
+                            "value": "nc_value_3"
                         }
                     ]
                 }
             ]
         },
         {
-            "name": "hh_load_2_count_act",
-            "id": 1,
+            "name": "read_value_8_3_act",
+            "id": 5,
             "runtime_data": [],
             "primitives": [
-                {
-                    "op": "modify_field_with_hash_based_offset",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_load_md",
-                                "index_2"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x0"
-                        },
-                        {
-                            "type": "calculation",
-                            "value": "hh_load_2_hash"
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x100"
-                        }
-                    ]
-                },
                 {
                     "op": "register_read",
                     "parameters": [
                         {
                             "type": "field",
                             "value": [
-                                "nc_load_md",
-                                "load_2"
+                                "nc_value_8",
+                                "value_8_3"
                             ]
                         },
                         {
                             "type": "register_array",
-                            "value": "hh_load_2_reg"
+                            "value": "value_8_3_reg"
                         },
                         {
                             "type": "field",
                             "value": [
-                                "nc_load_md",
-                                "index_2"
+                                "nc_cache_md",
+                                "cache_index"
                             ]
-                        }
-                    ]
-                },
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "hh_load_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_load_md",
-                                "index_2"
-                            ]
-                        },
-                        {
-                            "type": "expression",
-                            "value": {
-                                "type": "expression",
-                                "value": {
-                                    "op": "+",
-                                    "left": {
-                                        "type": "field",
-                                        "value": [
-                                            "nc_load_md",
-                                            "load_2"
-                                        ]
-                                    },
-                                    "right": {
-                                        "type": "hexstr",
-                                        "value": "0x1"
-                                    }
-                                }
-                            }
                         }
                     ]
                 }
             ]
         },
         {
-            "name": "write_value_2_2_act",
-            "id": 2,
+            "name": "write_value_3_1_act",
+            "id": 6,
             "runtime_data": [],
             "primitives": [
                 {
@@ -1307,7 +1425,7 @@
                     "parameters": [
                         {
                             "type": "register_array",
-                            "value": "value_2_2_reg"
+                            "value": "value_3_1_reg"
                         },
                         {
                             "type": "field",
@@ -1319,8 +1437,8 @@
                         {
                             "type": "field",
                             "value": [
-                                "nc_value_2",
-                                "value_2_2"
+                                "nc_value_3",
+                                "value_3_1"
                             ]
                         }
                     ]
@@ -1328,8 +1446,206 @@
             ]
         },
         {
+            "name": "write_value_3_2_act",
+            "id": 7,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_3_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_3",
+                                "value_3_2"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_8_4_act",
+            "id": 8,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_8",
+                                "value_8_4"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_8_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_3_3_act",
+            "id": 9,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_3_3_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_3",
+                                "value_3_3"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_3_4_act",
+            "id": 10,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_3_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_3",
+                                "value_3_4"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_2_1_act",
+            "id": 11,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_2",
+                                "value_2_1"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_2_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "add_value_header_8_act",
+            "id": 12,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "add_to_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "totalLen"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "add_to_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "udp",
+                                "len"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "add_header",
+                    "parameters": [
+                        {
+                            "type": "header",
+                            "value": "nc_value_8"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "write_value_8_1_act",
-            "id": 3,
+            "id": 13,
             "runtime_data": [],
             "primitives": [
                 {
@@ -1358,8 +1674,8 @@
             ]
         },
         {
-            "name": "write_value_2_3_act",
-            "id": 4,
+            "name": "write_value_8_2_act",
+            "id": 14,
             "runtime_data": [],
             "primitives": [
                 {
@@ -1367,7 +1683,7 @@
                     "parameters": [
                         {
                             "type": "register_array",
-                            "value": "value_2_3_reg"
+                            "value": "value_8_2_reg"
                         },
                         {
                             "type": "field",
@@ -1379,8 +1695,134 @@
                         {
                             "type": "field",
                             "value": [
-                                "nc_value_2",
-                                "value_2_3"
+                                "nc_value_8",
+                                "value_8_2"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "remove_value_header_3_act",
+            "id": 15,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "subtract_from_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "totalLen"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "subtract_from_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "udp",
+                                "len"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "remove_header",
+                    "parameters": [
+                        {
+                            "type": "header",
+                            "value": "nc_value_3"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "remove_value_header_1_act",
+            "id": 16,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "subtract_from_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "totalLen"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "subtract_from_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "udp",
+                                "len"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "remove_header",
+                    "parameters": [
+                        {
+                            "type": "header",
+                            "value": "nc_value_1"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_8_3_act",
+            "id": 17,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_8_3_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_8",
+                                "value_8_3"
                             ]
                         }
                     ]
@@ -1389,7 +1831,7 @@
         },
         {
             "name": "hh_load_3_count_act",
-            "id": 5,
+            "id": 18,
             "runtime_data": [],
             "primitives": [
                 {
@@ -1478,617 +1920,7 @@
             ]
         },
         {
-            "name": "read_value_6_2_act",
-            "id": 6,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_6",
-                                "value_6_2"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_6_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_2_4_act",
-            "id": 7,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_2_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_2",
-                                "value_2_4"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_6_3_act",
-            "id": 8,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_6",
-                                "value_6_3"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_6_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "hh_load_4_count_act",
-            "id": 9,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "modify_field_with_hash_based_offset",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_load_md",
-                                "index_4"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x0"
-                        },
-                        {
-                            "type": "calculation",
-                            "value": "hh_load_4_hash"
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x100"
-                        }
-                    ]
-                },
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_load_md",
-                                "load_4"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "hh_load_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_load_md",
-                                "index_4"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "hh_load_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_load_md",
-                                "index_4"
-                            ]
-                        },
-                        {
-                            "type": "expression",
-                            "value": {
-                                "type": "expression",
-                                "value": {
-                                    "op": "+",
-                                    "left": {
-                                        "type": "field",
-                                        "value": [
-                                            "nc_load_md",
-                                            "load_4"
-                                        ]
-                                    },
-                                    "right": {
-                                        "type": "hexstr",
-                                        "value": "0x1"
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_7_3_act",
-            "id": 10,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_7",
-                                "value_7_3"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_7_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_6_4_act",
-            "id": 11,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_6",
-                                "value_6_4"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_6_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "remove_value_header_2_act",
-            "id": 12,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "subtract_from_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "totalLen"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "subtract_from_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "udp",
-                                "len"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "remove_header",
-                    "parameters": [
-                        {
-                            "type": "header",
-                            "value": "nc_value_2"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_2_1_act",
-            "id": 13,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_2_1_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_2",
-                                "value_2_1"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "hh_bf_1_act",
-            "id": 14,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "modify_field_with_hash_based_offset",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "index_1"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x0"
-                        },
-                        {
-                            "type": "calculation",
-                            "value": "hh_bf_1_hash"
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x200"
-                        }
-                    ]
-                },
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "bf_1"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "hh_bf_1_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "index_1"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "hh_bf_1_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "index_1"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x1"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "remove_value_header_8_act",
-            "id": 15,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "subtract_from_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "totalLen"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "subtract_from_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "udp",
-                                "len"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "remove_header",
-                    "parameters": [
-                        {
-                            "type": "header",
-                            "value": "nc_value_8"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "add_value_header_6_act",
-            "id": 16,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "add_to_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "totalLen"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "add_to_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "udp",
-                                "len"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "add_header",
-                    "parameters": [
-                        {
-                            "type": "header",
-                            "value": "nc_value_6"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "hh_bf_2_act",
-            "id": 17,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "modify_field_with_hash_based_offset",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "index_2"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x0"
-                        },
-                        {
-                            "type": "calculation",
-                            "value": "hh_bf_2_hash"
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x200"
-                        }
-                    ]
-                },
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "bf_2"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "hh_bf_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "index_2"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "hh_bf_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "index_2"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x1"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "add_value_header_8_act",
-            "id": 18,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "add_to_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "totalLen"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "add_to_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "udp",
-                                "len"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "add_header",
-                    "parameters": [
-                        {
-                            "type": "header",
-                            "value": "nc_value_8"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_6_1_act",
+            "name": "write_value_8_4_act",
             "id": 19,
             "runtime_data": [],
             "primitives": [
@@ -2097,7 +1929,7 @@
                     "parameters": [
                         {
                             "type": "register_array",
-                            "value": "value_6_1_reg"
+                            "value": "value_8_4_reg"
                         },
                         {
                             "type": "field",
@@ -2109,8 +1941,8 @@
                         {
                             "type": "field",
                             "value": [
-                                "nc_value_6",
-                                "value_6_1"
+                                "nc_value_8",
+                                "value_8_4"
                             ]
                         }
                     ]
@@ -2118,29 +1950,77 @@
             ]
         },
         {
-            "name": "write_value_6_2_act",
+            "name": "remove_value_header_8_act",
             "id": 20,
             "runtime_data": [],
             "primitives": [
                 {
-                    "op": "register_write",
+                    "op": "subtract_from_field",
                     "parameters": [
                         {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "totalLen"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "subtract_from_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "udp",
+                                "len"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "remove_header",
+                    "parameters": [
+                        {
+                            "type": "header",
+                            "value": "nc_value_8"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_2_3_act",
+            "id": 21,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_2",
+                                "value_2_3"
+                            ]
+                        },
+                        {
                             "type": "register_array",
-                            "value": "value_6_2_reg"
+                            "value": "value_2_3_reg"
                         },
                         {
                             "type": "field",
                             "value": [
                                 "nc_cache_md",
                                 "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_6",
-                                "value_6_2"
                             ]
                         }
                     ]
@@ -2149,7 +2029,7 @@
         },
         {
             "name": "read_value_4_1_act",
-            "id": 21,
+            "id": 22,
             "runtime_data": [],
             "primitives": [
                 {
@@ -2179,7 +2059,7 @@
         },
         {
             "name": "read_value_4_2_act",
-            "id": 22,
+            "id": 23,
             "runtime_data": [],
             "primitives": [
                 {
@@ -2201,36 +2081,6 @@
                             "value": [
                                 "nc_cache_md",
                                 "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_6_3_act",
-            "id": 23,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_6_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_6",
-                                "value_6_3"
                             ]
                         }
                     ]
@@ -2288,65 +2138,8 @@
             ]
         },
         {
-            "name": "set_cache_valid_act",
-            "id": 26,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "cache_valid_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x1"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_1_3_act",
-            "id": 27,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_1",
-                                "value_1_3"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_1_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "name": "read_value_4_4_act",
-            "id": 28,
+            "id": 26,
             "runtime_data": [],
             "primitives": [
                 {
@@ -2375,8 +2168,370 @@
             ]
         },
         {
-            "name": "report_hot_act",
+            "name": "reply_read_hit_before_act",
+            "id": 27,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "reply_read_hit_info_md",
+                                "ipv4_srcAddr"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "srcAddr"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "reply_read_hit_info_md",
+                                "ipv4_dstAddr"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "dstAddr"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "check_cache_exist_act",
+            "id": 28,
+            "runtime_data": [
+                {
+                    "name": "index",
+                    "bitwidth": 14
+                }
+            ],
+            "primitives": [
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_exist"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x1"
+                        }
+                    ]
+                },
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "runtime_data",
+                            "value": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_1_1_act",
             "id": 29,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_1_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_1",
+                                "value_1_1"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "add_value_header_4_act",
+            "id": 30,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "add_to_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "totalLen"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "add_to_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "udp",
+                                "len"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "add_header",
+                    "parameters": [
+                        {
+                            "type": "header",
+                            "value": "nc_value_4"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_4_1_act",
+            "id": 31,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_4_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_4",
+                                "value_4_1"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "add_value_header_7_act",
+            "id": 32,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "add_to_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "totalLen"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "add_to_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "udp",
+                                "len"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "add_header",
+                    "parameters": [
+                        {
+                            "type": "header",
+                            "value": "nc_value_7"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_4_2_act",
+            "id": 33,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_4_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_4",
+                                "value_4_2"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "set_cache_valid_act",
+            "id": 34,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "cache_valid_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x1"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_2_2_act",
+            "id": 35,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_2",
+                                "value_2_2"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_2_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_4_3_act",
+            "id": 36,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_4_3_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_4",
+                                "value_4_3"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "report_hot_act",
+            "id": 37,
             "runtime_data": [],
             "primitives": [
                 {
@@ -2531,113 +2686,8 @@
             ]
         },
         {
-            "name": "reply_read_hit_before_act",
-            "id": 30,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "modify_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "reply_read_hit_info_md",
-                                "ipv4_srcAddr"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "srcAddr"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "op": "modify_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "reply_read_hit_info_md",
-                                "ipv4_dstAddr"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "dstAddr"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_3_1_act",
-            "id": 31,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_3",
-                                "value_3_1"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_3_1_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_3_2_act",
-            "id": 32,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_3",
-                                "value_3_2"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_3_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "remove_value_header_6_act",
-            "id": 33,
+            "name": "remove_value_header_5_act",
+            "id": 38,
             "runtime_data": [],
             "primitives": [
                 {
@@ -2677,15 +2727,15 @@
                     "parameters": [
                         {
                             "type": "header",
-                            "value": "nc_value_6"
+                            "value": "nc_value_5"
                         }
                     ]
                 }
             ]
         },
         {
-            "name": "write_value_8_2_act",
-            "id": 34,
+            "name": "write_value_4_4_act",
+            "id": 39,
             "runtime_data": [],
             "primitives": [
                 {
@@ -2693,7 +2743,7 @@
                     "parameters": [
                         {
                             "type": "register_array",
-                            "value": "value_8_2_reg"
+                            "value": "value_4_4_reg"
                         },
                         {
                             "type": "field",
@@ -2705,8 +2755,8 @@
                         {
                             "type": "field",
                             "value": [
-                                "nc_value_8",
-                                "value_8_2"
+                                "nc_value_4",
+                                "value_4_4"
                             ]
                         }
                     ]
@@ -2714,12 +2764,132 @@
             ]
         },
         {
-            "name": "add_value_header_4_act",
-            "id": 35,
+            "name": "read_value_2_4_act",
+            "id": 40,
             "runtime_data": [],
             "primitives": [
                 {
-                    "op": "add_to_field",
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_2",
+                                "value_2_4"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_2_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_1_1_act",
+            "id": 41,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_1",
+                                "value_1_1"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_1_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_1_2_act",
+            "id": 42,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_1",
+                                "value_1_2"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_1_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_7_1_act",
+            "id": 43,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_7",
+                                "value_7_1"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_7_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "remove_value_header_4_act",
+            "id": 44,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "subtract_from_field",
                     "parameters": [
                         {
                             "type": "field",
@@ -2735,7 +2905,7 @@
                     ]
                 },
                 {
-                    "op": "add_to_field",
+                    "op": "subtract_from_field",
                     "parameters": [
                         {
                             "type": "field",
@@ -2751,7 +2921,7 @@
                     ]
                 },
                 {
-                    "op": "add_header",
+                    "op": "remove_header",
                     "parameters": [
                         {
                             "type": "header",
@@ -2762,276 +2932,8 @@
             ]
         },
         {
-            "name": "read_value_3_4_act",
-            "id": 36,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_3",
-                                "value_3_4"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_3_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "set_egress",
-            "id": 37,
-            "runtime_data": [
-                {
-                    "name": "egress_spec",
-                    "bitwidth": 9
-                }
-            ],
-            "primitives": [
-                {
-                    "op": "modify_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "standard_metadata",
-                                "egress_spec"
-                            ]
-                        },
-                        {
-                            "type": "runtime_data",
-                            "value": 0
-                        }
-                    ]
-                },
-                {
-                    "op": "add_to_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "ttl"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "-0x1"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_4_1_act",
-            "id": 38,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_4_1_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_4",
-                                "value_4_1"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_4_2_act",
-            "id": 39,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_4_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_4",
-                                "value_4_2"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "hh_bf_3_act",
-            "id": 40,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "modify_field_with_hash_based_offset",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "index_3"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x0"
-                        },
-                        {
-                            "type": "calculation",
-                            "value": "hh_bf_3_hash"
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x200"
-                        }
-                    ]
-                },
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "bf_3"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "hh_bf_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "index_3"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "hh_bf_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "hh_bf_md",
-                                "index_3"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x1"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_6_1_act",
-            "id": 41,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_6",
-                                "value_6_1"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_6_1_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_4_3_act",
-            "id": 42,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_4_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_4",
-                                "value_4_3"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "name": "ethernet_set_mac_act",
-            "id": 43,
+            "id": 45,
             "runtime_data": [
                 {
                     "name": "smac",
@@ -3078,38 +2980,8 @@
             ]
         },
         {
-            "name": "write_value_4_4_act",
-            "id": 44,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_4_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_4",
-                                "value_4_4"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "add_value_header_3_act",
-            "id": 45,
+            "name": "add_value_header_2_act",
+            "id": 46,
             "runtime_data": [],
             "primitives": [
                 {
@@ -3149,62 +3021,14 @@
                     "parameters": [
                         {
                             "type": "header",
-                            "value": "nc_value_3"
+                            "value": "nc_value_2"
                         }
                     ]
                 }
             ]
         },
         {
-            "name": "remove_value_header_3_act",
-            "id": 46,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "subtract_from_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "totalLen"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "subtract_from_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "udp",
-                                "len"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "remove_header",
-                    "parameters": [
-                        {
-                            "type": "header",
-                            "value": "nc_value_3"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_3_1_act",
+            "name": "write_value_1_3_act",
             "id": 47,
             "runtime_data": [],
             "primitives": [
@@ -3213,7 +3037,7 @@
                     "parameters": [
                         {
                             "type": "register_array",
-                            "value": "value_3_1_reg"
+                            "value": "value_1_3_reg"
                         },
                         {
                             "type": "field",
@@ -3225,8 +3049,8 @@
                         {
                             "type": "field",
                             "value": [
-                                "nc_value_3",
-                                "value_3_1"
+                                "nc_value_1",
+                                "value_1_3"
                             ]
                         }
                     ]
@@ -3234,158 +3058,8 @@
             ]
         },
         {
-            "name": "write_value_3_2_act",
+            "name": "read_value_7_3_act",
             "id": 48,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_3_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_3",
-                                "value_3_2"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_2_3_act",
-            "id": 49,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_2",
-                                "value_2_3"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_2_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_1_1_act",
-            "id": 50,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_1",
-                                "value_1_1"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_1_1_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_1_2_act",
-            "id": 51,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_1",
-                                "value_1_2"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_1_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_3_3_act",
-            "id": 52,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_3_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_3",
-                                "value_3_3"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_7_1_act",
-            "id": 53,
             "runtime_data": [],
             "primitives": [
                 {
@@ -3395,12 +3069,12 @@
                             "type": "field",
                             "value": [
                                 "nc_value_7",
-                                "value_7_1"
+                                "value_7_3"
                             ]
                         },
                         {
                             "type": "register_array",
-                            "value": "value_7_1_reg"
+                            "value": "value_7_3_reg"
                         },
                         {
                             "type": "field",
@@ -3414,137 +3088,119 @@
             ]
         },
         {
-            "name": "write_value_8_3_act",
-            "id": 54,
+            "name": "hh_load_2_count_act",
+            "id": 49,
             "runtime_data": [],
             "primitives": [
                 {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_8_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_8",
-                                "value_8_3"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "remove_value_header_4_act",
-            "id": 55,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "subtract_from_field",
+                    "op": "modify_field_with_hash_based_offset",
                     "parameters": [
                         {
                             "type": "field",
                             "value": [
-                                "ipv4",
-                                "totalLen"
+                                "nc_load_md",
+                                "index_2"
                             ]
                         },
                         {
                             "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "subtract_from_field",
-                    "parameters": [
+                            "value": "0x0"
+                        },
                         {
-                            "type": "field",
-                            "value": [
-                                "udp",
-                                "len"
-                            ]
+                            "type": "calculation",
+                            "value": "hh_load_2_hash"
                         },
                         {
                             "type": "hexstr",
-                            "value": "0x10"
+                            "value": "0x100"
                         }
                     ]
                 },
-                {
-                    "op": "remove_header",
-                    "parameters": [
-                        {
-                            "type": "header",
-                            "value": "nc_value_4"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_3_4_act",
-            "id": 56,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_3_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_3",
-                                "value_3_4"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_1_4_act",
-            "id": 57,
-            "runtime_data": [],
-            "primitives": [
                 {
                     "op": "register_read",
                     "parameters": [
                         {
                             "type": "field",
                             "value": [
-                                "nc_value_1",
-                                "value_1_4"
+                                "nc_load_md",
+                                "load_2"
                             ]
                         },
                         {
                             "type": "register_array",
-                            "value": "value_1_4_reg"
+                            "value": "hh_load_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_load_md",
+                                "index_2"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "hh_load_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_load_md",
+                                "index_2"
+                            ]
+                        },
+                        {
+                            "type": "expression",
+                            "value": {
+                                "type": "expression",
+                                "value": {
+                                    "op": "+",
+                                    "left": {
+                                        "type": "field",
+                                        "value": [
+                                            "nc_load_md",
+                                            "load_2"
+                                        ]
+                                    },
+                                    "right": {
+                                        "type": "hexstr",
+                                        "value": "0x1"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_2_2_act",
+            "id": 50,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_2_2_reg"
                         },
                         {
                             "type": "field",
                             "value": [
                                 "nc_cache_md",
                                 "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_2",
+                                "value_2_2"
                             ]
                         }
                     ]
@@ -3553,7 +3209,7 @@
         },
         {
             "name": "read_value_7_4_act",
-            "id": 58,
+            "id": 51,
             "runtime_data": [],
             "primitives": [
                 {
@@ -3582,8 +3238,69 @@
             ]
         },
         {
-            "name": "write_value_6_4_act",
-            "id": 59,
+            "name": "reply_read_hit_after_act",
+            "id": 52,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "srcAddr"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "reply_read_hit_info_md",
+                                "ipv4_dstAddr"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "dstAddr"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "reply_read_hit_info_md",
+                                "ipv4_srcAddr"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_hdr",
+                                "op"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x1"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_2_3_act",
+            "id": 53,
             "runtime_data": [],
             "primitives": [
                 {
@@ -3591,7 +3308,7 @@
                     "parameters": [
                         {
                             "type": "register_array",
-                            "value": "value_6_4_reg"
+                            "value": "value_2_3_reg"
                         },
                         {
                             "type": "field",
@@ -3603,8 +3320,128 @@
                         {
                             "type": "field",
                             "value": [
+                                "nc_value_2",
+                                "value_2_3"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_1_3_act",
+            "id": 54,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_1",
+                                "value_1_3"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_1_3_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_6_1_act",
+            "id": 55,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
                                 "nc_value_6",
-                                "value_6_4"
+                                "value_6_1"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_6_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_6_2_act",
+            "id": 56,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_6",
+                                "value_6_2"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_6_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_2_4_act",
+            "id": 57,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_2_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_2",
+                                "value_2_4"
                             ]
                         }
                     ]
@@ -3613,7 +3450,7 @@
         },
         {
             "name": "add_value_header_1_act",
-            "id": 60,
+            "id": 58,
             "runtime_data": [],
             "primitives": [
                 {
@@ -3660,8 +3497,8 @@
             ]
         },
         {
-            "name": "read_value_2_4_act",
-            "id": 61,
+            "name": "read_value_6_3_act",
+            "id": 59,
             "runtime_data": [],
             "primitives": [
                 {
@@ -3670,13 +3507,13 @@
                         {
                             "type": "field",
                             "value": [
-                                "nc_value_2",
-                                "value_2_4"
+                                "nc_value_6",
+                                "value_6_3"
                             ]
                         },
                         {
                             "type": "register_array",
-                            "value": "value_2_4_reg"
+                            "value": "value_6_3_reg"
                         },
                         {
                             "type": "field",
@@ -3690,7 +3527,127 @@
             ]
         },
         {
-            "name": "write_value_1_1_act",
+            "name": "hh_load_4_count_act",
+            "id": 60,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "modify_field_with_hash_based_offset",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_load_md",
+                                "index_4"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x0"
+                        },
+                        {
+                            "type": "calculation",
+                            "value": "hh_load_4_hash"
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x100"
+                        }
+                    ]
+                },
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_load_md",
+                                "load_4"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "hh_load_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_load_md",
+                                "index_4"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "hh_load_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_load_md",
+                                "index_4"
+                            ]
+                        },
+                        {
+                            "type": "expression",
+                            "value": {
+                                "type": "expression",
+                                "value": {
+                                    "op": "+",
+                                    "left": {
+                                        "type": "field",
+                                        "value": [
+                                            "nc_load_md",
+                                            "load_4"
+                                        ]
+                                    },
+                                    "right": {
+                                        "type": "hexstr",
+                                        "value": "0x1"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_5_2_act",
+            "id": 61,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_5",
+                                "value_5_2"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_5_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_1_2_act",
             "id": 62,
             "runtime_data": [],
             "primitives": [
@@ -3699,7 +3656,7 @@
                     "parameters": [
                         {
                             "type": "register_array",
-                            "value": "value_1_1_reg"
+                            "value": "value_1_2_reg"
                         },
                         {
                             "type": "field",
@@ -3712,7 +3669,7 @@
                             "type": "field",
                             "value": [
                                 "nc_value_1",
-                                "value_1_1"
+                                "value_1_2"
                             ]
                         }
                     ]
@@ -3720,64 +3677,23 @@
             ]
         },
         {
-            "name": "add_value_header_7_act",
+            "name": "read_value_6_4_act",
             "id": 63,
             "runtime_data": [],
             "primitives": [
                 {
-                    "op": "add_to_field",
+                    "op": "register_read",
                     "parameters": [
                         {
                             "type": "field",
                             "value": [
-                                "ipv4",
-                                "totalLen"
+                                "nc_value_6",
+                                "value_6_4"
                             ]
                         },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "add_to_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "udp",
-                                "len"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "add_header",
-                    "parameters": [
-                        {
-                            "type": "header",
-                            "value": "nc_value_7"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_8_4_act",
-            "id": 64,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
                         {
                             "type": "register_array",
-                            "value": "value_8_4_reg"
+                            "value": "value_6_4_reg"
                         },
                         {
                             "type": "field",
@@ -3785,13 +3701,96 @@
                                 "nc_cache_md",
                                 "cache_index"
                             ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "hh_load_1_count_act",
+            "id": 64,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "modify_field_with_hash_based_offset",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_load_md",
+                                "index_1"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x0"
+                        },
+                        {
+                            "type": "calculation",
+                            "value": "hh_load_1_hash"
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x100"
+                        }
+                    ]
+                },
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_load_md",
+                                "load_1"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "hh_load_1_reg"
                         },
                         {
                             "type": "field",
                             "value": [
-                                "nc_value_8",
-                                "value_8_4"
+                                "nc_load_md",
+                                "index_1"
                             ]
+                        }
+                    ]
+                },
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "hh_load_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_load_md",
+                                "index_1"
+                            ]
+                        },
+                        {
+                            "type": "expression",
+                            "value": {
+                                "type": "expression",
+                                "value": {
+                                    "op": "+",
+                                    "left": {
+                                        "type": "field",
+                                        "value": [
+                                            "nc_load_md",
+                                            "load_1"
+                                        ]
+                                    },
+                                    "right": {
+                                        "type": "hexstr",
+                                        "value": "0x1"
+                                    }
+                                }
+                            }
                         }
                     ]
                 }
@@ -3888,188 +3887,8 @@
             ]
         },
         {
-            "name": "read_value_5_2_act",
+            "name": "remove_value_header_2_act",
             "id": 68,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_5",
-                                "value_5_2"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_5_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_1_4_act",
-            "id": 69,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_1_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_1",
-                                "value_1_4"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_1_2_act",
-            "id": 70,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_1_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_1",
-                                "value_1_2"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_5_3_act",
-            "id": 71,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_5",
-                                "value_5_3"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_5_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_7_4_act",
-            "id": 72,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_7_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_7",
-                                "value_7_4"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_5_4_act",
-            "id": 73,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_5",
-                                "value_5_4"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_5_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "remove_value_header_1_act",
-            "id": 74,
             "runtime_data": [],
             "primitives": [
                 {
@@ -4109,7 +3928,521 @@
                     "parameters": [
                         {
                             "type": "header",
-                            "value": "nc_value_1"
+                            "value": "nc_value_2"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_7_3_act",
+            "id": 69,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_7_3_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_7",
+                                "value_7_3"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_1_4_act",
+            "id": 70,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_1_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_1",
+                                "value_1_4"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "hh_bf_1_act",
+            "id": 71,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "modify_field_with_hash_based_offset",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "index_1"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x0"
+                        },
+                        {
+                            "type": "calculation",
+                            "value": "hh_bf_1_hash"
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x200"
+                        }
+                    ]
+                },
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "bf_1"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "hh_bf_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "index_1"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "hh_bf_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "index_1"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x1"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_7_2_act",
+            "id": 72,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_7",
+                                "value_7_2"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_7_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_5_3_act",
+            "id": 73,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_5",
+                                "value_5_3"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_5_3_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_7_4_act",
+            "id": 74,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_7_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_7",
+                                "value_7_4"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "remove_value_header_6_act",
+            "id": 75,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "subtract_from_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "totalLen"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "subtract_from_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "udp",
+                                "len"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "remove_header",
+                    "parameters": [
+                        {
+                            "type": "header",
+                            "value": "nc_value_6"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "add_value_header_6_act",
+            "id": 76,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "add_to_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "totalLen"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "add_to_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "udp",
+                                "len"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x10"
+                        }
+                    ]
+                },
+                {
+                    "op": "add_header",
+                    "parameters": [
+                        {
+                            "type": "header",
+                            "value": "nc_value_6"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_5_4_act",
+            "id": 77,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_5",
+                                "value_5_4"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_5_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_6_1_act",
+            "id": 78,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_6_1_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_6",
+                                "value_6_1"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_6_2_act",
+            "id": 79,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_6_2_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_6",
+                                "value_6_2"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "hh_bf_3_act",
+            "id": 80,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "modify_field_with_hash_based_offset",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "index_3"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x0"
+                        },
+                        {
+                            "type": "calculation",
+                            "value": "hh_bf_3_hash"
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x200"
+                        }
+                    ]
+                },
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "bf_3"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "hh_bf_3_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "index_3"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "hh_bf_3_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "hh_bf_md",
+                                "index_3"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x1"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "write_value_6_3_act",
+            "id": 81,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_6_3_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_6",
+                                "value_6_3"
+                            ]
                         }
                     ]
                 }
@@ -4117,7 +4450,7 @@
         },
         {
             "name": "remove_value_header_7_act",
-            "id": 75,
+            "id": 82,
             "runtime_data": [],
             "primitives": [
                 {
@@ -4164,8 +4497,38 @@
             ]
         },
         {
+            "name": "write_value_6_4_act",
+            "id": 83,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "value_6_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_6",
+                                "value_6_4"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "add_value_header_5_act",
-            "id": 76,
+            "id": 84,
             "runtime_data": [],
             "primitives": [
                 {
@@ -4212,8 +4575,38 @@
             ]
         },
         {
+            "name": "check_cache_valid_act",
+            "id": 85,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_valid"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "cache_valid_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "write_value_5_1_act",
-            "id": 77,
+            "id": 86,
             "runtime_data": [],
             "primitives": [
                 {
@@ -4243,7 +4636,7 @@
         },
         {
             "name": "write_value_5_2_act",
-            "id": 78,
+            "id": 87,
             "runtime_data": [],
             "primitives": [
                 {
@@ -4272,60 +4665,53 @@
             ]
         },
         {
-            "name": "check_cache_exist_act",
-            "id": 79,
-            "runtime_data": [
-                {
-                    "name": "index",
-                    "bitwidth": 14
-                }
-            ],
+            "name": "read_value_3_1_act",
+            "id": 88,
+            "runtime_data": [],
             "primitives": [
                 {
-                    "op": "modify_field",
+                    "op": "register_read",
                     "parameters": [
                         {
                             "type": "field",
                             "value": [
-                                "nc_cache_md",
-                                "cache_exist"
+                                "nc_value_3",
+                                "value_3_1"
                             ]
                         },
                         {
-                            "type": "hexstr",
-                            "value": "0x1"
-                        }
-                    ]
-                },
-                {
-                    "op": "modify_field",
-                    "parameters": [
+                            "type": "register_array",
+                            "value": "value_3_1_reg"
+                        },
                         {
                             "type": "field",
                             "value": [
                                 "nc_cache_md",
                                 "cache_index"
                             ]
-                        },
-                        {
-                            "type": "runtime_data",
-                            "value": 0
                         }
                     ]
                 }
             ]
         },
         {
-            "name": "write_value_1_3_act",
-            "id": 80,
+            "name": "read_value_3_2_act",
+            "id": 89,
             "runtime_data": [],
             "primitives": [
                 {
-                    "op": "register_write",
+                    "op": "register_read",
                     "parameters": [
                         {
+                            "type": "field",
+                            "value": [
+                                "nc_value_3",
+                                "value_3_2"
+                            ]
+                        },
+                        {
                             "type": "register_array",
-                            "value": "value_1_3_reg"
+                            "value": "value_3_2_reg"
                         },
                         {
                             "type": "field",
@@ -4333,12 +4719,35 @@
                                 "nc_cache_md",
                                 "cache_index"
                             ]
-                        },
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "read_value_1_4_act",
+            "id": 90,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
                         {
                             "type": "field",
                             "value": [
                                 "nc_value_1",
-                                "value_1_3"
+                                "value_1_4"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_1_4_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
                             ]
                         }
                     ]
@@ -4347,7 +4756,7 @@
         },
         {
             "name": "write_value_5_3_act",
-            "id": 81,
+            "id": 91,
             "runtime_data": [],
             "primitives": [
                 {
@@ -4376,8 +4785,38 @@
             ]
         },
         {
+            "name": "read_value_3_3_act",
+            "id": 92,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_value_3",
+                                "value_3_3"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "value_3_3_reg"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "nc_cache_md",
+                                "cache_index"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "write_value_5_4_act",
-            "id": 82,
+            "id": 93,
             "runtime_data": [],
             "primitives": [
                 {
@@ -4406,69 +4845,8 @@
             ]
         },
         {
-            "name": "reply_read_hit_after_act",
-            "id": 83,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "modify_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "srcAddr"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "reply_read_hit_info_md",
-                                "ipv4_dstAddr"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "op": "modify_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "dstAddr"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "reply_read_hit_info_md",
-                                "ipv4_srcAddr"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "op": "modify_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_hdr",
-                                "op"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x1"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "check_cache_valid_act",
-            "id": 84,
+            "name": "read_value_3_4_act",
+            "id": 94,
             "runtime_data": [],
             "primitives": [
                 {
@@ -4477,13 +4855,13 @@
                         {
                             "type": "field",
                             "value": [
-                                "nc_cache_md",
-                                "cache_valid"
+                                "nc_value_3",
+                                "value_3_4"
                             ]
                         },
                         {
                             "type": "register_array",
-                            "value": "cache_valid_reg"
+                            "value": "value_3_4_reg"
                         },
                         {
                             "type": "field",
@@ -4497,20 +4875,13 @@
             ]
         },
         {
-            "name": "read_value_2_1_act",
-            "id": 85,
+            "name": "write_value_2_1_act",
+            "id": 95,
             "runtime_data": [],
             "primitives": [
                 {
-                    "op": "register_read",
+                    "op": "register_write",
                     "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_2",
-                                "value_2_1"
-                            ]
-                        },
                         {
                             "type": "register_array",
                             "value": "value_2_1_reg"
@@ -4521,383 +4892,12 @@
                                 "nc_cache_md",
                                 "cache_index"
                             ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_2_2_act",
-            "id": 86,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
+                        },
                         {
                             "type": "field",
                             "value": [
                                 "nc_value_2",
-                                "value_2_2"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_2_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_8_1_act",
-            "id": 87,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_8",
-                                "value_8_1"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_8_1_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "remove_value_header_5_act",
-            "id": 88,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "subtract_from_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "totalLen"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "subtract_from_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "udp",
-                                "len"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x10"
-                        }
-                    ]
-                },
-                {
-                    "op": "remove_header",
-                    "parameters": [
-                        {
-                            "type": "header",
-                            "value": "nc_value_5"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_7_2_act",
-            "id": 89,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_7",
-                                "value_7_2"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_7_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_8_3_act",
-            "id": 90,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_8",
-                                "value_8_3"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_8_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "write_value_7_3_act",
-            "id": 91,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "value_7_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_7",
-                                "value_7_3"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_8_4_act",
-            "id": 92,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_8",
-                                "value_8_4"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_8_4_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_8_2_act",
-            "id": 93,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_8",
-                                "value_8_2"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_8_2_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "hh_load_1_count_act",
-            "id": 94,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "modify_field_with_hash_based_offset",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_load_md",
-                                "index_1"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x0"
-                        },
-                        {
-                            "type": "calculation",
-                            "value": "hh_load_1_hash"
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x100"
-                        }
-                    ]
-                },
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_load_md",
-                                "load_1"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "hh_load_1_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_load_md",
-                                "index_1"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "op": "register_write",
-                    "parameters": [
-                        {
-                            "type": "register_array",
-                            "value": "hh_load_1_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_load_md",
-                                "index_1"
-                            ]
-                        },
-                        {
-                            "type": "expression",
-                            "value": {
-                                "type": "expression",
-                                "value": {
-                                    "op": "+",
-                                    "left": {
-                                        "type": "field",
-                                        "value": [
-                                            "nc_load_md",
-                                            "load_1"
-                                        ]
-                                    },
-                                    "right": {
-                                        "type": "hexstr",
-                                        "value": "0x1"
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "read_value_3_3_act",
-            "id": 95,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "register_read",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_value_3",
-                                "value_3_3"
-                            ]
-                        },
-                        {
-                            "type": "register_array",
-                            "value": "value_3_3_reg"
-                        },
-                        {
-                            "type": "field",
-                            "value": [
-                                "nc_cache_md",
-                                "cache_index"
+                                "value_2_1"
                             ]
                         }
                     ]
