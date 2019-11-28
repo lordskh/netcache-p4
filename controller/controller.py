@@ -12,7 +12,7 @@ CONTROLLER_IP = "10.0.0.3"
 path_hot = "hot.txt"
 path_log = "controller_log.txt"
 
-len_key = 4
+len_key = 16
 len_val = 128
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -30,15 +30,13 @@ for line in f.readlines():
     key_header = int(key_header)
     for i in range(len(key_body)):
         key_body[i] = int(key_body[i], 16)
-    fake_field = ""
-    for i in range(len_key):
-        fake_field += struct.pack("B", 0)
+
     key_field = ""
     key_field += struct.pack(">I", key_header)
     for i in range(len(key_body)):
         key_field += struct.pack("B", key_body[i])
 
-    packet = op_field + fake_field + key_field
+    packet = op_field + key_field
     s.sendto(packet, (SERVER_IP, NC_PORT))
     time.sleep(0.001)
 f.close()

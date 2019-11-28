@@ -11,7 +11,7 @@ SERVER_IP = "10.0.0.2"
 CONTROLLER_IP = "10.0.0.3"
 path_reply = "reply.txt"
 
-len_key = 4
+len_key = 16
 
 counter = 0
 def counting():
@@ -34,4 +34,4 @@ while True:
     #f.write(str(key_header) + '\n')
     #f.flush()
     #print counter
-#f.close()
+#f.close()    
