@@ -1,6 +1,31 @@
 #include <core.p4>
 #include <v1model.p4>
 
+#define NC_PORT 8888
+
+#define NUM_CACHE 128
+
+#define NC_READ_REQUEST     0
+#define NC_READ_REPLY       1
+#define NC_HOT_READ_REQUEST 2
+#define NC_WRITE_REQUEST    4
+#define NC_WRITE_REPLY      5
+#define NC_UPDATE_REQUEST   8
+#define NC_UPDATE_REPLY     9
+#define NC_UPDATE_KEY_REPLY 7
+
+#define ETHER_TYPE_IPV4 0x0800
+#define IPV4_PROTOCOL_TCP 6
+#define IPV4_PROTOCOL_UDP 17
+
+#define HH_LOAD_WIDTH       32
+#define HH_LOAD_NUM         256
+#define HH_LOAD_HASH_WIDTH  8
+#define HH_THRESHOLD        128
+#define HH_BF_NUM           512
+#define HH_BF_HASH_WIDTH    9
+#define CONTROLLER_IP 0x0a000003
+
 struct hh_bf_md_t {
     bit<16> index_1;
     bit<16> index_2;
@@ -188,26 +213,26 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
     state parse_ethernet {
         packet.extract(hdr.ethernet);
         transition select(hdr.ethernet.etherType) {
-            16w0x800: parse_ipv4;
+            ETHER_TYPE_IPV4: parse_ipv4;
             default: accept;
         }
     }
     state parse_ipv4 {
         packet.extract(hdr.ipv4);
         transition select(hdr.ipv4.protocol) {
-            8w6: parse_tcp;
-            8w17: parse_udp;
+            IPV4_PROTOCOL_TCP: parse_tcp;
+            IPV4_PROTOCOL_UDP: parse_udp;
             default: accept;
         }
     }
     state parse_nc_hdr {
         packet.extract(hdr.nc_hdr);
         transition select(hdr.nc_hdr.op) {
-            8w0: accept;
-            8w1: parse_value;
-            8w2: parse_nc_load;
-            8w8: accept;
-            8w9: parse_value;
+            NC_READ_REQUEST: accept;
+            NC_READ_REPLY: parse_value;
+            NC_HOT_READ_REQUEST: parse_nc_load;
+            NC_UPDATE_REQUEST: accept;
+            NC_UPDATE_REPLY: parse_value;
             default: accept;
         }
     }
@@ -257,7 +282,7 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
     state parse_udp {
         packet.extract(hdr.udp);
         transition select(hdr.udp.dstPort) {
-            16w8888: parse_nc_hdr;
+            NC_PORT: parse_nc_hdr;
             default: accept;
         }
     }
@@ -269,11 +294,11 @@ parser ParserImpl(packet_in packet, out headers hdr, inout metadata meta, inout 
     }
 }
 
-register<bit<1>>(32w512) hh_bf_1_reg;
+register<bit<1>>(HH_BF_NUM) hh_bf_1_reg;
 
-register<bit<1>>(32w512) hh_bf_2_reg;
+register<bit<1>>(HH_BF_NUM) hh_bf_2_reg;
 
-register<bit<1>>(32w512) hh_bf_3_reg;
+register<bit<1>>(HH_BF_NUM) hh_bf_3_reg;
 
 control bloom_filter(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action hh_bf_1_act() {
@@ -313,13 +338,13 @@ control bloom_filter(inout headers hdr, inout metadata meta, inout standard_meta
     }
 }
 
-register<bit<32>>(32w256) hh_load_1_reg;
+register<bit<HH_LOAD_WIDTH>>(HH_LOAD_NUM) hh_load_1_reg;
 
-register<bit<32>>(32w256) hh_load_2_reg;
+register<bit<HH_LOAD_WIDTH>>(HH_LOAD_NUM) hh_load_2_reg;
 
-register<bit<32>>(32w256) hh_load_3_reg;
+register<bit<HH_LOAD_WIDTH>>(HH_LOAD_NUM) hh_load_3_reg;
 
-register<bit<32>>(32w256) hh_load_4_reg;
+register<bit<HH_LOAD_WIDTH>>(HH_LOAD_NUM) hh_load_4_reg;
 
 control count_min(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action hh_load_1_count_act() {
@@ -386,15 +411,15 @@ control report_hot_step_1(inout headers hdr, inout metadata meta, inout standard
 
 control report_hot_step_2(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action report_hot_act() {
-        hdr.nc_hdr.op = 8w2;
+        hdr.nc_hdr.op = NC_HOT_READ_REQUEST;
         hdr.nc_load.setValid();
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16w16;
-        hdr.udp.len = hdr.udp.len + 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16;
+        hdr.udp.len = hdr.udp.len + 16;
         hdr.nc_load.load_1 = meta.nc_load_md.load_1;
         hdr.nc_load.load_2 = meta.nc_load_md.load_2;
         hdr.nc_load.load_3 = meta.nc_load_md.load_3;
         hdr.nc_load.load_4 = meta.nc_load_md.load_4;
-        hdr.ipv4.dstAddr = 32w0xa000003;
+        hdr.ipv4.dstAddr = CONTROLLER_IP;
     }
     table report_hot {
         actions = {
@@ -412,14 +437,14 @@ control heavy_hitter(inout headers hdr, inout metadata meta, inout standard_meta
     report_hot_step_1() report_hot_step_1_0;
     report_hot_step_2() report_hot_step_2_0;
     apply {
-        if (standard_metadata.instance_type == 32w0) {
+        if (standard_metadata.instance_type == 0) {
             count_min_0.apply(hdr, meta, standard_metadata);
-            if (meta.nc_load_md.load_1 > 32w128) {
-                if (meta.nc_load_md.load_2 > 32w128) {
-                    if (meta.nc_load_md.load_3 > 32w128) {
-                        if (meta.nc_load_md.load_4 > 32w128) {
+            if (meta.nc_load_md.load_1 > HH_THRESHOLD) {
+                if (meta.nc_load_md.load_2 > HH_THRESHOLD) {
+                    if (meta.nc_load_md.load_3 > HH_THRESHOLD) {
+                        if (meta.nc_load_md.load_4 > HH_THRESHOLD) {
                             bloom_filter_0.apply(hdr, meta, standard_metadata);
-                            if (meta.hh_bf_md.bf_1 == 1w0 || meta.hh_bf_md.bf_2 == 1w0 || meta.hh_bf_md.bf_3 == 1w0) {
+                            if (meta.hh_bf_md.bf_1 == 0 || meta.hh_bf_md.bf_2 == 0 || meta.hh_bf_md.bf_3 == 0) {
                                 report_hot_step_1_0.apply(hdr, meta, standard_metadata);
                             }
                         }
@@ -447,18 +472,18 @@ control egress(inout headers hdr, inout metadata meta, inout standard_metadata_t
     }
     heavy_hitter() heavy_hitter_0;
     apply {
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_exist != 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_exist != 1) {
             heavy_hitter_0.apply(hdr, meta, standard_metadata);
         }
         ethernet_set_mac.apply();
     }
 }
 
-register<bit<1>>(32w128) cache_valid_reg;
+register<bit<1>>(NUM_CACHE) cache_valid_reg;
 
 control process_cache(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action check_cache_exist_act(bit<14> index) {
-        meta.nc_cache_md.cache_exist = 1w1;
+        meta.nc_cache_md.cache_exist = 1;
         meta.nc_cache_md.cache_index = index;
     }
     action check_cache_valid_act() {
@@ -474,7 +499,7 @@ control process_cache(inout headers hdr, inout metadata meta, inout standard_met
         key = {
             hdr.nc_hdr.key: exact;
         }
-        size = 128;
+        size = NUM_CACHE;
     }
     table check_cache_valid {
         actions = {
@@ -488,11 +513,11 @@ control process_cache(inout headers hdr, inout metadata meta, inout standard_met
     }
     apply {
         check_cache_exist.apply();
-        if (meta.nc_cache_md.cache_exist == 1w1) {
-            if (hdr.nc_hdr.op == 8w0) {
+        if (meta.nc_cache_md.cache_exist == 1) {
+            if (hdr.nc_hdr.op == NC_READ_REQUEST) {
                 check_cache_valid.apply();
             } else {
-                if (hdr.nc_hdr.op == 8w9) {
+                if (hdr.nc_hdr.op == NC_UPDATE_REPLY) {
                     set_cache_valid.apply();
                 }
             }
@@ -500,18 +525,18 @@ control process_cache(inout headers hdr, inout metadata meta, inout standard_met
     }
 }
 
-register<bit<32>>(32w128) value_1_1_reg;
+register<bit<32>>(NUM_CACHE) value_1_1_reg;
 
-register<bit<32>>(32w128) value_1_2_reg;
+register<bit<32>>(NUM_CACHE) value_1_2_reg;
 
-register<bit<32>>(32w128) value_1_3_reg;
+register<bit<32>>(NUM_CACHE) value_1_3_reg;
 
-register<bit<32>>(32w128) value_1_4_reg;
+register<bit<32>>(NUM_CACHE) value_1_4_reg;
 
 control process_value_1(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action add_value_header_1_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16w16;
-        hdr.udp.len = hdr.udp.len + 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16;
+        hdr.udp.len = hdr.udp.len + 16;
         hdr.nc_value_1.setValid();
     }
     action read_value_1_1_act() {
@@ -527,8 +552,8 @@ control process_value_1(inout headers hdr, inout metadata meta, inout standard_m
         value_1_4_reg.read(hdr.nc_value_1.value_1_4, (bit<32>)meta.nc_cache_md.cache_index);
     }
     action remove_value_header_1_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16w16;
-        hdr.udp.len = hdr.udp.len - 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16;
+        hdr.udp.len = hdr.udp.len - 16;
         hdr.nc_value_1.setInvalid();
     }
     action write_value_1_1_act() {
@@ -594,14 +619,14 @@ control process_value_1(inout headers hdr, inout metadata meta, inout standard_m
         }
     }
     apply {
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_valid == 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1w1) {
             add_value_header_1.apply();
             read_value_1_1.apply();
             read_value_1_2.apply();
             read_value_1_3.apply();
             read_value_1_4.apply();
         } else {
-            if (hdr.nc_hdr.op == 8w9 && meta.nc_cache_md.cache_exist == 1w1) {
+            if (hdr.nc_hdr.op == NC_UPDATE_REPLY && meta.nc_cache_md.cache_exist == 1w1) {
                 write_value_1_1.apply();
                 write_value_1_2.apply();
                 write_value_1_3.apply();
@@ -612,18 +637,18 @@ control process_value_1(inout headers hdr, inout metadata meta, inout standard_m
     }
 }
 
-register<bit<32>>(32w128) value_2_1_reg;
+register<bit<32>>(NUM_CACHE) value_2_1_reg;
 
-register<bit<32>>(32w128) value_2_2_reg;
+register<bit<32>>(NUM_CACHE) value_2_2_reg;
 
-register<bit<32>>(32w128) value_2_3_reg;
+register<bit<32>>(NUM_CACHE) value_2_3_reg;
 
-register<bit<32>>(32w128) value_2_4_reg;
+register<bit<32>>(NUM_CACHE) value_2_4_reg;
 
 control process_value_2(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action add_value_header_2_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16w16;
-        hdr.udp.len = hdr.udp.len + 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16;
+        hdr.udp.len = hdr.udp.len + 16;
         hdr.nc_value_2.setValid();
     }
     action read_value_2_1_act() {
@@ -639,8 +664,8 @@ control process_value_2(inout headers hdr, inout metadata meta, inout standard_m
         value_2_4_reg.read(hdr.nc_value_2.value_2_4, (bit<32>)meta.nc_cache_md.cache_index);
     }
     action remove_value_header_2_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16w16;
-        hdr.udp.len = hdr.udp.len - 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16;
+        hdr.udp.len = hdr.udp.len - 16;
         hdr.nc_value_2.setInvalid();
     }
     action write_value_2_1_act() {
@@ -706,14 +731,14 @@ control process_value_2(inout headers hdr, inout metadata meta, inout standard_m
         }
     }
     apply {
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_valid == 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
             add_value_header_2.apply();
             read_value_2_1.apply();
             read_value_2_2.apply();
             read_value_2_3.apply();
             read_value_2_4.apply();
         } else {
-            if (hdr.nc_hdr.op == 8w9 && meta.nc_cache_md.cache_exist == 1w1) {
+            if (hdr.nc_hdr.op == NC_UPDATE_REPLY && meta.nc_cache_md.cache_exist == 1) {
                 write_value_2_1.apply();
                 write_value_2_2.apply();
                 write_value_2_3.apply();
@@ -724,18 +749,18 @@ control process_value_2(inout headers hdr, inout metadata meta, inout standard_m
     }
 }
 
-register<bit<32>>(32w128) value_3_1_reg;
+register<bit<32>>(NUM_CACHE) value_3_1_reg;
 
-register<bit<32>>(32w128) value_3_2_reg;
+register<bit<32>>(NUM_CACHE) value_3_2_reg;
 
-register<bit<32>>(32w128) value_3_3_reg;
+register<bit<32>>(NUM_CACHE) value_3_3_reg;
 
-register<bit<32>>(32w128) value_3_4_reg;
+register<bit<32>>(NUM_CACHE) value_3_4_reg;
 
 control process_value_3(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action add_value_header_3_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16w16;
-        hdr.udp.len = hdr.udp.len + 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16;
+        hdr.udp.len = hdr.udp.len + 16;
         hdr.nc_value_3.setValid();
     }
     action read_value_3_1_act() {
@@ -751,8 +776,8 @@ control process_value_3(inout headers hdr, inout metadata meta, inout standard_m
         value_3_4_reg.read(hdr.nc_value_3.value_3_4, (bit<32>)meta.nc_cache_md.cache_index);
     }
     action remove_value_header_3_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16w16;
-        hdr.udp.len = hdr.udp.len - 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16;
+        hdr.udp.len = hdr.udp.len - 16;
         hdr.nc_value_3.setInvalid();
     }
     action write_value_3_1_act() {
@@ -818,14 +843,14 @@ control process_value_3(inout headers hdr, inout metadata meta, inout standard_m
         }
     }
     apply {
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_valid == 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
             add_value_header_3.apply();
             read_value_3_1.apply();
             read_value_3_2.apply();
             read_value_3_3.apply();
             read_value_3_4.apply();
         } else {
-            if (hdr.nc_hdr.op == 8w9 && meta.nc_cache_md.cache_exist == 1w1) {
+            if (hdr.nc_hdr.op == NC_UPDATE_REPLY && meta.nc_cache_md.cache_exist == 1) {
                 write_value_3_1.apply();
                 write_value_3_2.apply();
                 write_value_3_3.apply();
@@ -836,18 +861,18 @@ control process_value_3(inout headers hdr, inout metadata meta, inout standard_m
     }
 }
 
-register<bit<32>>(32w128) value_4_1_reg;
+register<bit<32>>(NUM_CACHE) value_4_1_reg;
 
-register<bit<32>>(32w128) value_4_2_reg;
+register<bit<32>>(NUM_CACHE) value_4_2_reg;
 
-register<bit<32>>(32w128) value_4_3_reg;
+register<bit<32>>(NUM_CACHE) value_4_3_reg;
 
-register<bit<32>>(32w128) value_4_4_reg;
+register<bit<32>>(NUM_CACHE) value_4_4_reg;
 
 control process_value_4(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action add_value_header_4_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16w16;
-        hdr.udp.len = hdr.udp.len + 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16;
+        hdr.udp.len = hdr.udp.len + 16;
         hdr.nc_value_4.setValid();
     }
     action read_value_4_1_act() {
@@ -863,8 +888,8 @@ control process_value_4(inout headers hdr, inout metadata meta, inout standard_m
         value_4_4_reg.read(hdr.nc_value_4.value_4_4, (bit<32>)meta.nc_cache_md.cache_index);
     }
     action remove_value_header_4_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16w16;
-        hdr.udp.len = hdr.udp.len - 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16;
+        hdr.udp.len = hdr.udp.len - 16;
         hdr.nc_value_4.setInvalid();
     }
     action write_value_4_1_act() {
@@ -930,14 +955,14 @@ control process_value_4(inout headers hdr, inout metadata meta, inout standard_m
         }
     }
     apply {
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_valid == 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
             add_value_header_4.apply();
             read_value_4_1.apply();
             read_value_4_2.apply();
             read_value_4_3.apply();
             read_value_4_4.apply();
         } else {
-            if (hdr.nc_hdr.op == 8w9 && meta.nc_cache_md.cache_exist == 1w1) {
+            if (hdr.nc_hdr.op == NC_UPDATE_REPLY && meta.nc_cache_md.cache_exist == 1) {
                 write_value_4_1.apply();
                 write_value_4_2.apply();
                 write_value_4_3.apply();
@@ -948,18 +973,18 @@ control process_value_4(inout headers hdr, inout metadata meta, inout standard_m
     }
 }
 
-register<bit<32>>(32w128) value_5_1_reg;
+register<bit<32>>(NUM_CACHE) value_5_1_reg;
 
-register<bit<32>>(32w128) value_5_2_reg;
+register<bit<32>>(NUM_CACHE) value_5_2_reg;
 
-register<bit<32>>(32w128) value_5_3_reg;
+register<bit<32>>(NUM_CACHE) value_5_3_reg;
 
-register<bit<32>>(32w128) value_5_4_reg;
+register<bit<32>>(NUM_CACHE) value_5_4_reg;
 
 control process_value_5(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action add_value_header_5_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16w16;
-        hdr.udp.len = hdr.udp.len + 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16;
+        hdr.udp.len = hdr.udp.len + 16;
         hdr.nc_value_5.setValid();
     }
     action read_value_5_1_act() {
@@ -975,8 +1000,8 @@ control process_value_5(inout headers hdr, inout metadata meta, inout standard_m
         value_5_4_reg.read(hdr.nc_value_5.value_5_4, (bit<32>)meta.nc_cache_md.cache_index);
     }
     action remove_value_header_5_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16w16;
-        hdr.udp.len = hdr.udp.len - 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16;
+        hdr.udp.len = hdr.udp.len - 16;
         hdr.nc_value_5.setInvalid();
     }
     action write_value_5_1_act() {
@@ -1042,14 +1067,14 @@ control process_value_5(inout headers hdr, inout metadata meta, inout standard_m
         }
     }
     apply {
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_valid == 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
             add_value_header_5.apply();
             read_value_5_1.apply();
             read_value_5_2.apply();
             read_value_5_3.apply();
             read_value_5_4.apply();
         } else {
-            if (hdr.nc_hdr.op == 8w9 && meta.nc_cache_md.cache_exist == 1w1) {
+            if (hdr.nc_hdr.op == NC_UPDATE_REPLY && meta.nc_cache_md.cache_exist == 1) {
                 write_value_5_1.apply();
                 write_value_5_2.apply();
                 write_value_5_3.apply();
@@ -1060,18 +1085,18 @@ control process_value_5(inout headers hdr, inout metadata meta, inout standard_m
     }
 }
 
-register<bit<32>>(32w128) value_6_1_reg;
+register<bit<32>>(NUM_CACHE) value_6_1_reg;
 
-register<bit<32>>(32w128) value_6_2_reg;
+register<bit<32>>(NUM_CACHE) value_6_2_reg;
 
-register<bit<32>>(32w128) value_6_3_reg;
+register<bit<32>>(NUM_CACHE) value_6_3_reg;
 
-register<bit<32>>(32w128) value_6_4_reg;
+register<bit<32>>(NUM_CACHE) value_6_4_reg;
 
 control process_value_6(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action add_value_header_6_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16w16;
-        hdr.udp.len = hdr.udp.len + 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16;
+        hdr.udp.len = hdr.udp.len + 16;
         hdr.nc_value_6.setValid();
     }
     action read_value_6_1_act() {
@@ -1087,8 +1112,8 @@ control process_value_6(inout headers hdr, inout metadata meta, inout standard_m
         value_6_4_reg.read(hdr.nc_value_6.value_6_4, (bit<32>)meta.nc_cache_md.cache_index);
     }
     action remove_value_header_6_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16w16;
-        hdr.udp.len = hdr.udp.len - 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16;
+        hdr.udp.len = hdr.udp.len - 16;
         hdr.nc_value_6.setInvalid();
     }
     action write_value_6_1_act() {
@@ -1154,14 +1179,14 @@ control process_value_6(inout headers hdr, inout metadata meta, inout standard_m
         }
     }
     apply {
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_valid == 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
             add_value_header_6.apply();
             read_value_6_1.apply();
             read_value_6_2.apply();
             read_value_6_3.apply();
             read_value_6_4.apply();
         } else {
-            if (hdr.nc_hdr.op == 8w9 && meta.nc_cache_md.cache_exist == 1w1) {
+            if (hdr.nc_hdr.op == NC_UPDATE_REPLY && meta.nc_cache_md.cache_exist == 1) {
                 write_value_6_1.apply();
                 write_value_6_2.apply();
                 write_value_6_3.apply();
@@ -1172,18 +1197,18 @@ control process_value_6(inout headers hdr, inout metadata meta, inout standard_m
     }
 }
 
-register<bit<32>>(32w128) value_7_1_reg;
+register<bit<32>>(NUM_CACHE) value_7_1_reg;
 
-register<bit<32>>(32w128) value_7_2_reg;
+register<bit<32>>(NUM_CACHE) value_7_2_reg;
 
-register<bit<32>>(32w128) value_7_3_reg;
+register<bit<32>>(NUM_CACHE) value_7_3_reg;
 
-register<bit<32>>(32w128) value_7_4_reg;
+register<bit<32>>(NUM_CACHE) value_7_4_reg;
 
 control process_value_7(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action add_value_header_7_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16w16;
-        hdr.udp.len = hdr.udp.len + 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16;
+        hdr.udp.len = hdr.udp.len + 16;
         hdr.nc_value_7.setValid();
     }
     action read_value_7_1_act() {
@@ -1199,8 +1224,8 @@ control process_value_7(inout headers hdr, inout metadata meta, inout standard_m
         value_7_4_reg.read(hdr.nc_value_7.value_7_4, (bit<32>)meta.nc_cache_md.cache_index);
     }
     action remove_value_header_7_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16w16;
-        hdr.udp.len = hdr.udp.len - 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16;
+        hdr.udp.len = hdr.udp.len - 16;
         hdr.nc_value_7.setInvalid();
     }
     action write_value_7_1_act() {
@@ -1266,14 +1291,14 @@ control process_value_7(inout headers hdr, inout metadata meta, inout standard_m
         }
     }
     apply {
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_valid == 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
             add_value_header_7.apply();
             read_value_7_1.apply();
             read_value_7_2.apply();
             read_value_7_3.apply();
             read_value_7_4.apply();
         } else {
-            if (hdr.nc_hdr.op == 8w9 && meta.nc_cache_md.cache_exist == 1w1) {
+            if (hdr.nc_hdr.op == NC_UPDATE_REPLY && meta.nc_cache_md.cache_exist == 1) {
                 write_value_7_1.apply();
                 write_value_7_2.apply();
                 write_value_7_3.apply();
@@ -1284,18 +1309,18 @@ control process_value_7(inout headers hdr, inout metadata meta, inout standard_m
     }
 }
 
-register<bit<32>>(32w128) value_8_1_reg;
+register<bit<32>>(NUM_CACHE) value_8_1_reg;
 
-register<bit<32>>(32w128) value_8_2_reg;
+register<bit<32>>(NUM_CACHE) value_8_2_reg;
 
-register<bit<32>>(32w128) value_8_3_reg;
+register<bit<32>>(NUM_CACHE) value_8_3_reg;
 
-register<bit<32>>(32w128) value_8_4_reg;
+register<bit<32>>(NUM_CACHE) value_8_4_reg;
 
 control process_value_8(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action add_value_header_8_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16w16;
-        hdr.udp.len = hdr.udp.len + 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen + 16;
+        hdr.udp.len = hdr.udp.len + 16;
         hdr.nc_value_8.setValid();
     }
     action read_value_8_1_act() {
@@ -1311,8 +1336,8 @@ control process_value_8(inout headers hdr, inout metadata meta, inout standard_m
         value_8_4_reg.read(hdr.nc_value_8.value_8_4, (bit<32>)meta.nc_cache_md.cache_index);
     }
     action remove_value_header_8_act() {
-        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16w16;
-        hdr.udp.len = hdr.udp.len - 16w16;
+        hdr.ipv4.totalLen = hdr.ipv4.totalLen - 16;
+        hdr.udp.len = hdr.udp.len - 16;
         hdr.nc_value_8.setInvalid();
     }
     action write_value_8_1_act() {
@@ -1378,14 +1403,14 @@ control process_value_8(inout headers hdr, inout metadata meta, inout standard_m
         }
     }
     apply {
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_valid == 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
             add_value_header_8.apply();
             read_value_8_1.apply();
             read_value_8_2.apply();
             read_value_8_3.apply();
             read_value_8_4.apply();
         } else {
-            if (hdr.nc_hdr.op == 8w9 && meta.nc_cache_md.cache_exist == 1w1) {
+            if (hdr.nc_hdr.op == NC_UPDATE_REPLY && meta.nc_cache_md.cache_exist == 1) {
                 write_value_8_1.apply();
                 write_value_8_2.apply();
                 write_value_8_3.apply();
@@ -1400,7 +1425,7 @@ control process_value(inout headers hdr, inout metadata meta, inout standard_met
     action reply_read_hit_after_act() {
         hdr.ipv4.srcAddr = meta.reply_read_hit_info_md.ipv4_dstAddr;
         hdr.ipv4.dstAddr = meta.reply_read_hit_info_md.ipv4_srcAddr;
-        hdr.nc_hdr.op = 8w1;
+        hdr.nc_hdr.op = NC_READ_REPLY;
     }
     action reply_read_hit_before_act() {
         meta.reply_read_hit_info_md.ipv4_srcAddr = hdr.ipv4.srcAddr;
@@ -1425,7 +1450,7 @@ control process_value(inout headers hdr, inout metadata meta, inout standard_met
     process_value_7() process_value_7_0;
     process_value_8() process_value_8_0;
     apply {
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_valid == 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
             reply_read_hit_before.apply();
         }
         process_value_1_0.apply(hdr, meta, standard_metadata);
@@ -1436,7 +1461,7 @@ control process_value(inout headers hdr, inout metadata meta, inout standard_met
         process_value_6_0.apply(hdr, meta, standard_metadata);
         process_value_7_0.apply(hdr, meta, standard_metadata);
         process_value_8_0.apply(hdr, meta, standard_metadata);
-        if (hdr.nc_hdr.op == 8w0 && meta.nc_cache_md.cache_valid == 1w1) {
+        if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
             reply_read_hit_after.apply();
         }
     }
@@ -1445,7 +1470,7 @@ control process_value(inout headers hdr, inout metadata meta, inout standard_met
 control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
     action set_egress(bit<9> egress_spec) {
         standard_metadata.egress_spec = egress_spec;
-        hdr.ipv4.ttl = hdr.ipv4.ttl - 8w1;
+        hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
     }
     @stage(11) table ipv4_route {
         actions = {
