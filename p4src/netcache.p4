@@ -321,16 +321,19 @@ control bloom_filter(inout headers hdr, inout metadata meta, inout standard_meta
         actions = {
             hh_bf_1_act;
         }
+        default_action = hh_bf_1_act;
     }
     table hh_bf_2 {
         actions = {
             hh_bf_2_act;
         }
+        default_action = hh_bf_2_act;
     }
     table hh_bf_3 {
         actions = {
             hh_bf_3_act;
         }
+        default_action = hh_bf_3_act;
     }
     apply {
         hh_bf_1.apply();
@@ -372,21 +375,25 @@ control count_min(inout headers hdr, inout metadata meta, inout standard_metadat
         actions = {
             hh_load_1_count_act;
         }
+        default_action = hh_load_1_count_act;
     }
     table hh_load_2_count {
         actions = {
             hh_load_2_count_act;
         }
+        default_action = hh_load_2_count_act;
     }
     table hh_load_3_count {
         actions = {
             hh_load_3_count_act;
         }
+        default_action = hh_load_3_count_act;
     }
     table hh_load_4_count {
         actions = {
             hh_load_4_count_act;
         }
+        default_action = hh_load_4_count_act;
     }
     apply {
         hh_load_1_count.apply();
@@ -404,6 +411,7 @@ control report_hot_step_1(inout headers hdr, inout metadata meta, inout standard
         actions = {
             clone_to_controller_act;
         }
+        default_action = clone_to_controller_act;
     }
     apply {
         clone_to_controller.apply();
@@ -426,6 +434,7 @@ control report_hot_step_2(inout headers hdr, inout metadata meta, inout standard
         actions = {
             report_hot_act;
         }
+        default_action = report_hot_act;
     }
     apply {
         report_hot.apply();
@@ -520,26 +529,31 @@ control process_cache(inout headers hdr, inout metadata meta, inout standard_met
         actions = {
             check_cache_exist_act;
         }
+        default_action = check_cache_exist_act;
     }
     table check_cache_valid {
         actions = {
             check_cache_valid_act;
         }
+        default_action = check_cache_valid_act;
     }
     table set_cache_valid {
         actions = {
             set_cache_valid_act;
         }
+        default_action = set_cache_valid_act;
     }
     table set_cache_exist {
         actions = {
             set_cache_exist_act;
         }
+        default_action = set_cache_exist_act;
     }
     table load_key {
         actions = {
             load_key_act;
         }
+        default_action = load_key_act;
     }
     apply {
         check_cache_exist.apply();
@@ -582,21 +596,25 @@ control process_key(inout headers hdr, inout metadata meta, inout standard_metad
         actions = {
             write_key_1_act;
         }
+        default_action = write_key_1_act;
     }
     table write_key_2 {
         actions = {
             write_key_2_act;
         }
+        default_action = write_key_2_act;
     }
     table write_key_3 {
         actions = {
             write_key_3_act;
         }
+        default_action = write_key_3_act;
     }
     table write_key_4 {
         actions = {
             write_key_4_act;
         }
+        default_action = write_key_4_act;
     }
     apply {
         if (hdr.nc_hdr.op == NC_UPDATE_REPLY && meta.nc_cache_md.cache_exist == 0) {
@@ -655,51 +673,61 @@ control process_value_1(inout headers hdr, inout metadata meta, inout standard_m
         actions = {
             add_value_header_1_act;
         }
+        default_action = add_value_header_1_act;
     }
     table read_value_1_1 {
         actions = {
             read_value_1_1_act;
         }
+        default_action = read_value_1_1_act;
     }
     table read_value_1_2 {
         actions = {
             read_value_1_2_act;
         }
+        default_action = read_value_1_2_act;
     }
     table read_value_1_3 {
         actions = {
             read_value_1_3_act;
         }
+        default_action = read_value_1_3_act;
     }
     table read_value_1_4 {
         actions = {
             read_value_1_4_act;
         }
+        default_action = read_value_1_4_act;
     }
     table remove_value_header_1 {
         actions = {
             remove_value_header_1_act;
         }
+        default_action = remove_value_header_1_act;
     }
     table write_value_1_1 {
         actions = {
             write_value_1_1_act;
         }
+        default_action = write_value_1_1_act;
     }
     table write_value_1_2 {
         actions = {
             write_value_1_2_act;
         }
+        default_action = write_value_1_2_act;
     }
     table write_value_1_3 {
         actions = {
             write_value_1_3_act;
         }
+        default_action = write_value_1_3_act;
     }
     table write_value_1_4 {
         actions = {
             write_value_1_4_act;
         }
+        default_action = write_value_1_4_act;
     }
     apply {
         if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1w1) {
@@ -767,51 +795,61 @@ control process_value_2(inout headers hdr, inout metadata meta, inout standard_m
         actions = {
             add_value_header_2_act;
         }
+        default_action = add_value_header_2_act;
     }
     table read_value_2_1 {
         actions = {
             read_value_2_1_act;
         }
+        default_action = read_value_2_1_act;
     }
     table read_value_2_2 {
         actions = {
             read_value_2_2_act;
         }
+        default_action = read_value_2_2_act;
     }
     table read_value_2_3 {
         actions = {
             read_value_2_3_act;
         }
+        default_action = read_value_2_3_act;
     }
     table read_value_2_4 {
         actions = {
             read_value_2_4_act;
         }
+        default_action = read_value_2_4_act;
     }
     table remove_value_header_2 {
         actions = {
             remove_value_header_2_act;
         }
+        default_action = remove_value_header_2_act;
     }
     table write_value_2_1 {
         actions = {
             write_value_2_1_act;
         }
+        default_action = write_value_2_1_act;
     }
     table write_value_2_2 {
         actions = {
             write_value_2_2_act;
         }
+        default_action = write_value_2_2_act;
     }
     table write_value_2_3 {
         actions = {
             write_value_2_3_act;
         }
+        default_action = write_value_2_3_act;
     }
     table write_value_2_4 {
         actions = {
             write_value_2_4_act;
         }
+        default_action = write_value_2_4_act;
     }
     apply {
         if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
@@ -879,51 +917,61 @@ control process_value_3(inout headers hdr, inout metadata meta, inout standard_m
         actions = {
             add_value_header_3_act;
         }
+        default_action = add_value_header_3_act;
     }
     table read_value_3_1 {
         actions = {
             read_value_3_1_act;
         }
+        default_action = read_value_3_1_act;
     }
     table read_value_3_2 {
         actions = {
             read_value_3_2_act;
         }
+        default_action = read_value_3_2_act;
     }
     table read_value_3_3 {
         actions = {
             read_value_3_3_act;
         }
+        default_action = read_value_3_3_act;
     }
     table read_value_3_4 {
         actions = {
             read_value_3_4_act;
         }
+        default_action = read_value_3_4_act;
     }
     table remove_value_header_3 {
         actions = {
             remove_value_header_3_act;
         }
+        default_action = remove_value_header_3_act;
     }
     table write_value_3_1 {
         actions = {
             write_value_3_1_act;
         }
+        default_action = write_value_3_1_act;
     }
     table write_value_3_2 {
         actions = {
             write_value_3_2_act;
         }
+        default_action = write_value_3_2_act;
     }
     table write_value_3_3 {
         actions = {
             write_value_3_3_act;
         }
+        default_action = write_value_3_3_act;
     }
     table write_value_3_4 {
         actions = {
             write_value_3_4_act;
         }
+        default_action = write_value_3_4_act;
     }
     apply {
         if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
@@ -991,51 +1039,61 @@ control process_value_4(inout headers hdr, inout metadata meta, inout standard_m
         actions = {
             add_value_header_4_act;
         }
+        default_action = add_value_header_4_act;
     }
     table read_value_4_1 {
         actions = {
             read_value_4_1_act;
         }
+        default_action = read_value_4_1_act;
     }
     table read_value_4_2 {
         actions = {
             read_value_4_2_act;
         }
+        default_action = read_value_4_2_act;
     }
     table read_value_4_3 {
         actions = {
             read_value_4_3_act;
         }
+        default_action = read_value_4_3_act;
     }
     table read_value_4_4 {
         actions = {
             read_value_4_4_act;
         }
+        default_action = read_value_4_4_act;
     }
     table remove_value_header_4 {
         actions = {
             remove_value_header_4_act;
         }
+        default_action = remove_value_header_4_act;
     }
     table write_value_4_1 {
         actions = {
             write_value_4_1_act;
         }
+        default_action = write_value_4_1_act;
     }
     table write_value_4_2 {
         actions = {
             write_value_4_2_act;
         }
+        default_action = write_value_4_2_act;
     }
     table write_value_4_3 {
         actions = {
             write_value_4_3_act;
         }
+        default_action = write_value_4_3_act;
     }
     table write_value_4_4 {
         actions = {
             write_value_4_4_act;
         }
+        default_action = write_value_4_4_act;
     }
     apply {
         if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
@@ -1103,51 +1161,61 @@ control process_value_5(inout headers hdr, inout metadata meta, inout standard_m
         actions = {
             add_value_header_5_act;
         }
+        default_action = add_value_header_5_act;
     }
     table read_value_5_1 {
         actions = {
             read_value_5_1_act;
         }
+        default_action = read_value_5_1_act;
     }
     table read_value_5_2 {
         actions = {
             read_value_5_2_act;
         }
+        default_action = read_value_5_2_act;
     }
     table read_value_5_3 {
         actions = {
             read_value_5_3_act;
         }
+        default_action = read_value_5_3_act;
     }
     table read_value_5_4 {
         actions = {
             read_value_5_4_act;
         }
+        default_action = read_value_5_4_act;
     }
     table remove_value_header_5 {
         actions = {
             remove_value_header_5_act;
         }
+        default_action = remove_value_header_5_act;
     }
     table write_value_5_1 {
         actions = {
             write_value_5_1_act;
         }
+        default_action = write_value_5_1_act;
     }
     table write_value_5_2 {
         actions = {
             write_value_5_2_act;
         }
+        default_action = write_value_5_2_act;
     }
     table write_value_5_3 {
         actions = {
             write_value_5_3_act;
         }
+        default_action = write_value_5_3_act;
     }
     table write_value_5_4 {
         actions = {
             write_value_5_4_act;
         }
+        default_action = write_value_5_4_act;
     }
     apply {
         if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
@@ -1215,51 +1283,61 @@ control process_value_6(inout headers hdr, inout metadata meta, inout standard_m
         actions = {
             add_value_header_6_act;
         }
+        default_action = add_value_header_6_act;
     }
     table read_value_6_1 {
         actions = {
             read_value_6_1_act;
         }
+        default_action = read_value_6_1_act;
     }
     table read_value_6_2 {
         actions = {
             read_value_6_2_act;
         }
+        default_action = read_value_6_2_act;
     }
     table read_value_6_3 {
         actions = {
             read_value_6_3_act;
         }
+        default_action = read_value_6_3_act;
     }
     table read_value_6_4 {
         actions = {
             read_value_6_4_act;
         }
+        default_action = read_value_6_4_act;
     }
     table remove_value_header_6 {
         actions = {
             remove_value_header_6_act;
         }
+        default_action = remove_value_header_6_act;
     }
     table write_value_6_1 {
         actions = {
             write_value_6_1_act;
         }
+        default_action = write_value_6_1_act;
     }
     table write_value_6_2 {
         actions = {
             write_value_6_2_act;
         }
+        default_action = write_value_6_2_act;
     }
     table write_value_6_3 {
         actions = {
             write_value_6_3_act;
         }
+        default_action = write_value_6_3_act;
     }
     table write_value_6_4 {
         actions = {
             write_value_6_4_act;
         }
+        default_action = write_value_6_4_act;
     }
     apply {
         if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
@@ -1327,51 +1405,61 @@ control process_value_7(inout headers hdr, inout metadata meta, inout standard_m
         actions = {
             add_value_header_7_act;
         }
+        default_action = add_value_header_7_act;
     }
     table read_value_7_1 {
         actions = {
             read_value_7_1_act;
         }
+        default_action = read_value_7_1_act;
     }
     table read_value_7_2 {
         actions = {
             read_value_7_2_act;
         }
+        default_action = read_value_7_2_act;
     }
     table read_value_7_3 {
         actions = {
             read_value_7_3_act;
         }
+        default_action = read_value_7_3_act;
     }
     table read_value_7_4 {
         actions = {
             read_value_7_4_act;
         }
+        default_action = read_value_7_4_act;
     }
     table remove_value_header_7 {
         actions = {
             remove_value_header_7_act;
         }
+        default_action = remove_value_header_7_act;
     }
     table write_value_7_1 {
         actions = {
             write_value_7_1_act;
         }
+        default_action = write_value_7_1_act;
     }
     table write_value_7_2 {
         actions = {
             write_value_7_2_act;
         }
+        default_action = write_value_7_2_act;
     }
     table write_value_7_3 {
         actions = {
             write_value_7_3_act;
         }
+        default_action = write_value_7_3_act;
     }
     table write_value_7_4 {
         actions = {
             write_value_7_4_act;
         }
+        default_action = write_value_7_4_act;
     }
     apply {
         if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
@@ -1439,51 +1527,61 @@ control process_value_8(inout headers hdr, inout metadata meta, inout standard_m
         actions = {
             add_value_header_8_act;
         }
+        default_action = add_value_header_8_act;
     }
     table read_value_8_1 {
         actions = {
             read_value_8_1_act;
         }
+        default_action = read_value_8_1_act;
     }
     table read_value_8_2 {
         actions = {
             read_value_8_2_act;
         }
+        default_action = read_value_8_2_act;
     }
     table read_value_8_3 {
         actions = {
             read_value_8_3_act;
         }
+        default_action = read_value_8_3_act;
     }
     table read_value_8_4 {
         actions = {
             read_value_8_4_act;
         }
+        default_action = read_value_8_4_act;
     }
     table remove_value_header_8 {
         actions = {
             remove_value_header_8_act;
         }
+        default_action = remove_value_header_8_act;
     }
     table write_value_8_1 {
         actions = {
             write_value_8_1_act;
         }
+        default_action = write_value_8_1_act;
     }
     table write_value_8_2 {
         actions = {
             write_value_8_2_act;
         }
+        default_action = write_value_8_2_act;
     }
     table write_value_8_3 {
         actions = {
             write_value_8_3_act;
         }
+        default_action = write_value_8_3_act;
     }
     table write_value_8_4 {
         actions = {
             write_value_8_4_act;
         }
+        default_action = write_value_8_4_act;
     }
     apply {
         if (hdr.nc_hdr.op == NC_READ_REQUEST && meta.nc_cache_md.cache_valid == 1) {
@@ -1518,11 +1616,13 @@ control process_value(inout headers hdr, inout metadata meta, inout standard_met
         actions = {
             reply_read_hit_after_act;
         }
+        default_action = reply_read_hit_after_act;
     }
     table reply_read_hit_before {
         actions = {
             reply_read_hit_before_act;
         }
+        default_action = reply_read_hit_before_act;
     }
     process_value_1() process_value_1_0;
     process_value_2() process_value_2_0;
