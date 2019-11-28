@@ -62,11 +62,16 @@ s.bind((SERVER_IP, NC_PORT))
 #f = open(path_log, "w")
 while True:
     packet, addr = s.recvfrom(2048)
+    print ("length of packet is", len(packet))
     op_field = packet[0]
-    key_field = packet[5:]
+    # dummy_field = packet[1:5]
+    key_field = packet[5:5+len_key]
+    val_field = packet[5+len_key:]
 
     op = struct.unpack("B", op_field)[0]
+    # print (struct.unpack("BBBB", dummy_field))
     key_header = struct.unpack(">I", key_field[:4])[0]
+    print (key_header)
 
     if (op == NC_READ_REQUEST or op == NC_HOT_READ_REQUEST):
         op = NC_READ_REPLY
@@ -87,6 +92,22 @@ while True:
         hash_field, key_field, val_field = kv[key_header]
         packet = op_field + hash_field + key_field
         s.sendto(packet, (CONTROLLER_IP, NC_PORT))
+
+    elif (op == NC_WRITE_REQUEST):
+        op = NC_WRITE_REPLY
+        # update value
+        print("Update request is received")
+        # Create hash_field for packed key
+        key_hash = binascii.crc32(key_field) % (1<<32)
+        hash_field = struct.pack(">I", key_hash)
+        # Update is KV store
+        kv[key_header] = (hash_field, key_field, val_field)
+        # Send reply
+        op_field = struct.pack("B", op)
+        hash_field, key_field, val_field = kv[key_header]
+        packet = op_field + hash_field + val_field
+        # How to send directly to the switch ??
+        s.sendto(packet, (CLIENT_IP, NC_PORT))
 
     #f.write(str(op) + ' ')
     #f.write(str(key_header) + '\n')

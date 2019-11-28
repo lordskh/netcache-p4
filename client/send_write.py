@@ -13,6 +13,7 @@ path_query = "query_write.txt"
 query_rate = 1000
 
 len_key = 4
+len_val = 128   # length of value is 128 bytes
 
 counter = 0
 def counting():
@@ -45,7 +46,12 @@ for line in f.readlines():
     key_field = struct.pack(">I", key_header)
     for i in range(len(key_body)):
         key_field += struct.pack("B", int(key_body[i], 16))
-    packet = op_field + fake_field + key_field
+
+    val_field = ""
+    for i in range(0, len_val):
+        val_field += struct.pack("B", int('0x2', 16))
+
+    packet = op_field + fake_field + key_field + val_field
 
     s.sendto(packet, (SERVER_IP, NC_PORT))
     counter = counter + 1

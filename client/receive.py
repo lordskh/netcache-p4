@@ -28,6 +28,10 @@ s.bind((CLIENT_IP, NC_PORT))
 while True:
     packet, addr = s.recvfrom(1024)
     counter = counter + 1
+    # Ensuring the new value is sent back in the packet
+    print (struct.unpack("B", packet[5:6])[0])
+
+    # Old commented code from repo
     #op = struct.unpack("B", packet[0])
     #key_header = struct.unpack(">I", packet[1:5])[0]
     #f.write(str(op) + ' ')
