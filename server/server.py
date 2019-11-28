@@ -2,6 +2,7 @@ import socket
 import struct
 import time
 import thread
+import sys
 
 from nc_config import *
 
@@ -33,6 +34,12 @@ for i in range(2, 3002, 3):
         val[i] = int(val[i], 16)
 
     key_field = ""
+    if len_key < 4 + len(key_body):
+        print("Keys too long, please regen")
+        sys.exit()
+    pad = len_key - (4 + len(key_body))
+    for i in range(pad):
+        key_field += struct.pack("B", 0)
     key_field += struct.pack(">I", key_header)
     for i in range(len(key_body)):
         key_field += struct.pack("B", key_body[i])

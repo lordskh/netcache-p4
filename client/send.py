@@ -33,7 +33,14 @@ for line in f.readlines():
     key_body = line[2:]
 
     op_field = struct.pack("B", NC_READ_REQUEST)
-    key_field = struct.pack(">I", key_header)
+    key_field = ""
+    if len_key < 4 + len(key_body):
+        print("Keys too long, please regen")
+        sys.exit()
+    pad = len_key - (4 + len(key_body))
+    for i in range(pad):
+        key_field += struct.pack("B", 0)
+    key_field += struct.pack(">I", key_header)
     for i in range(len(key_body)):
         key_field += struct.pack("B", int(key_body[i], 16))
     packet = op_field + key_field
