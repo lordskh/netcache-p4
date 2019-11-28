@@ -57,7 +57,7 @@ field_list_calculation key_hash {
 }
 
 action check_cache_exist_act() {
-    modify_field_with_hash_based_offset(nc_cache_md.cache_index, 0, key_hash, 1 << 31);
+    modify_field_with_hash_based_offset(nc_cache_md.cache_index, 0, key_hash, NUM_CACHE);
     register_read(nc_cache_md.cache_exist, cache_exist_reg, nc_cache_md.cache_index);
 }
 table check_cache_exist {
