@@ -35,10 +35,10 @@ for line in f.readlines():
     if len_key < 4 + len(key_body):
         print("Keys too long, please regen")
         sys.exit()
+    key_field += struct.pack(">I", key_header)
     pad = len_key - (4 + len(key_body))
     for i in range(pad):
         key_field += struct.pack("B", 0)
-    key_field += struct.pack(">I", key_header)
     for i in range(len(key_body)):
         key_field += struct.pack("B", key_body[i])
 
@@ -46,7 +46,7 @@ for line in f.readlines():
     s.sendto(packet, (SERVER_IP, NC_PORT))
     time.sleep(0.001)
 f.close()
-
+counter = 0
 ## Listen hot report
 #f = open(path_log, "w")
 while True:

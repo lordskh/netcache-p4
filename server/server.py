@@ -70,7 +70,6 @@ while True:
 
     op = struct.unpack("B", op_field)[0]
     key_header = struct.unpack(">I", key_field[:4])[0]
-
     if (op == NC_READ_REQUEST or op == NC_HOT_READ_REQUEST):
         op = NC_READ_REPLY
         op_field = struct.pack("B", op)
