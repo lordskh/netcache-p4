@@ -37,8 +37,9 @@ struct hh_bf_md_t {
 
 struct nc_cache_md_t {
     bit<1>  cache_exist;
-    bit<14> cache_index;
+    bit<32> cache_index;
     bit<1>  cache_valid;
+    bit<128> full_key;
 }
 
 struct nc_load_md_t {
@@ -479,12 +480,21 @@ control egress(inout headers hdr, inout metadata meta, inout standard_metadata_t
     }
 }
 
+register<bit<32>>(NUM_CACHE) key_1_reg;
+
+register<bit<32>>(NUM_CACHE) key_2_reg;
+
+register<bit<32>>(NUM_CACHE) key_3_reg;
+
+register<bit<32>>(NUM_CACHE) key_4_reg;
+
+register<bit<1>>(NUM_CACHE) cache_exist_reg;
 register<bit<1>>(NUM_CACHE) cache_valid_reg;
 
 control process_cache(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
-    action check_cache_exist_act(bit<14> index) {
-        meta.nc_cache_md.cache_exist = 1;
-        meta.nc_cache_md.cache_index = index;
+    action check_cache_exist_act() {
+        hash(meta.nc_cache_md.cache_index, HashAlgorithm.crc32, (bit<32>)0, {hdr.nc_hdr.key}, (bit<32>)1 << 31);
+        cache_valid_reg.read(meta.nc_cache_md.cache_valid, (bit<32>)meta.nc_cache_md.cache_index);
     }
     action check_cache_valid_act() {
         cache_valid_reg.read(meta.nc_cache_md.cache_valid, (bit<32>)meta.nc_cache_md.cache_index);
@@ -492,14 +502,24 @@ control process_cache(inout headers hdr, inout metadata meta, inout standard_met
     action set_cache_valid_act() {
         cache_valid_reg.write((bit<32>)meta.nc_cache_md.cache_index, (bit<1>)1);
     }
+    action set_cache_exist_act() {
+        cache_exist_reg.write((bit<32>)meta.nc_cache_md.cache_index, 0);
+    }
+    action load_key_act() {
+		bit<32> key_1;
+		bit<32> key_2;
+		bit<32> key_3;
+		bit<32> key_4;
+		key_1_reg.read(key_1, (bit<32>)meta.nc_cache_md.cache_index);
+		key_2_reg.read(key_2, (bit<32>)meta.nc_cache_md.cache_index);
+		key_3_reg.read(key_3, (bit<32>)meta.nc_cache_md.cache_index);
+		key_4_reg.read(key_4, (bit<32>)meta.nc_cache_md.cache_index);
+        meta.nc_cache_md.full_key = key_1 ++ key_2 ++ key_3 ++ key_4;
+    }
     table check_cache_exist {
         actions = {
             check_cache_exist_act;
         }
-        key = {
-            hdr.nc_hdr.key: exact;
-        }
-        size = NUM_CACHE;
     }
     table check_cache_valid {
         actions = {
@@ -511,16 +531,79 @@ control process_cache(inout headers hdr, inout metadata meta, inout standard_met
             set_cache_valid_act;
         }
     }
+    table set_cache_exist {
+        actions = {
+            set_cache_exist_act;
+        }
+    }
+    table load_key {
+        actions = {
+            load_key_act;
+        }
+    }
     apply {
         check_cache_exist.apply();
         if (meta.nc_cache_md.cache_exist == 1) {
-            if (hdr.nc_hdr.op == NC_READ_REQUEST) {
-                check_cache_valid.apply();
-            } else {
-                if (hdr.nc_hdr.op == NC_UPDATE_REPLY) {
-                    set_cache_valid.apply();
+            load_key.apply();
+            if (meta.nc_cache_md.full_key == hdr.nc_hdr.key) {
+                if (hdr.nc_hdr.op == NC_READ_REQUEST) {
+                    check_cache_valid.apply();
+                } else {
+                    if (hdr.nc_hdr.op == NC_UPDATE_REPLY) {
+                        set_cache_valid.apply();
+                    }
                 }
+            } else {
+                meta.nc_cache_md.cache_exist = 0;
             }
+        } else {
+            if (hdr.nc_hdr.op == NC_UPDATE_REPLY) {
+                set_cache_exist.apply();
+                set_cache_valid.apply();
+            }
+        }
+    }
+}
+
+control process_key(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
+    action write_key_1_act() {
+        key_1_reg.write((bit<32>)meta.nc_cache_md.cache_index, (bit<32>)hdr.nc_hdr.key[31:0]);
+    }
+    action write_key_2_act() {
+        key_2_reg.write((bit<32>)meta.nc_cache_md.cache_index, (bit<32>)hdr.nc_hdr.key[63:32]);
+    }
+    action write_key_3_act() {
+        key_3_reg.write((bit<32>)meta.nc_cache_md.cache_index, (bit<32>)hdr.nc_hdr.key[95:64]);
+    }
+    action write_key_4_act() {
+        key_4_reg.write((bit<32>)meta.nc_cache_md.cache_index, (bit<32>)hdr.nc_hdr.key[127:96]);
+    }
+    table write_key_1 {
+        actions = {
+            write_key_1_act;
+        }
+    }
+    table write_key_2 {
+        actions = {
+            write_key_2_act;
+        }
+    }
+    table write_key_3 {
+        actions = {
+            write_key_3_act;
+        }
+    }
+    table write_key_4 {
+        actions = {
+            write_key_4_act;
+        }
+    }
+    apply {
+        if (hdr.nc_hdr.op == NC_UPDATE_REPLY && meta.nc_cache_md.cache_exist == 0) {
+            write_key_1.apply();
+            write_key_2.apply();
+            write_key_3.apply();
+            write_key_4.apply();
         }
     }
 }
@@ -1482,9 +1565,11 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
         size = 8192;
     }
     process_cache() process_cache_0;
+    process_key() process_key_0;
     process_value() process_value_0;
     apply {
         process_cache_0.apply(hdr, meta, standard_metadata);
+        process_key_0.apply(hdr, meta, standard_metadata);
         process_value_0.apply(hdr, meta, standard_metadata);
         ipv4_route.apply();
     }
