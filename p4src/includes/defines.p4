@@ -9,4 +9,3 @@
 #define NC_WRITE_REPLY      5
 #define NC_UPDATE_REQUEST   8
 #define NC_UPDATE_REPLY     9
-#define NC_UPDATE_KEY_REPLY 7

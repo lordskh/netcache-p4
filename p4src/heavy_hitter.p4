@@ -21,7 +21,10 @@ header_type nc_load_md_t {
 metadata nc_load_md_t nc_load_md;
 
 field_list hh_hash_fields {
-    nc_hdr.key;
+    nc_hdr.key_1;
+    nc_hdr.key_2;
+    nc_hdr.key_3;
+    nc_hdr.key_4;
 }
 
 register hh_load_1_reg {
