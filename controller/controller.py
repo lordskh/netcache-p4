@@ -2,7 +2,6 @@ import socket
 import struct
 import time
 import thread
-
 from nc_config import *
 
 NC_PORT = 8888
@@ -46,7 +45,71 @@ for line in f.readlines():
     s.sendto(packet, (SERVER_IP, NC_PORT))
     time.sleep(0.001)
 f.close()
-counter = 0
+
+cachekeys = []
+hhkeys = []
+hits = {}
+hhhits = {}
+
+def clear_hh():
+    global cachekeys
+    global hhkeys
+    global hits
+    global hhhits
+    while True:
+        time.sleep(1)
+        for k in hhkeys:
+            try:
+                hits[k] += hhhits[k]
+            except KeyError:
+                hits[k] = hhhits[k]
+            hhhits[k] = 0
+        op = NC_CLEAR_HOT
+        op_field = struct.pack("B", op)
+        key_field = ""
+        for i in range(len_key):
+            key_field += struct.pack("B", 0)
+        packet = op_field + key_field
+        s.sendto(packet, (SERVER_IP, NC_PORT))
+thread.start_new_thread(clear_hh, ())
+
+def refresh_cache():
+    global cachekeys
+    global hhkeys
+    global hits
+    global hhhits
+    while True:
+        time.sleep(10.1)
+        for k in cachekeys:
+            op = NC_HITS_REQUEST
+            op_field = struct.pack("B", op)
+            packet = op_field + k
+            s.sendto(packet, (SERVER_IP, NC_PORT))
+        while(len(hits) > len(cachekeys) + len(hhkeys)):
+            continue
+
+        newkeys = sorted(hits, key=hits.get, reverse=True)[:128]
+        keepkeys = set(newkeys).intersection(set(cachekeys))
+        removekeys = list(set(cachekeys).difference(keepkeys))
+        addkeys = list(set(newkeys).difference(keepkeys))
+
+        for k in removekeys:
+            op = NC_REMOVE
+            op_field = struct.pack("B", op)
+            packet = op_field + k
+            s.sendto(packet, (SERVER_IP, NC_PORT))
+        for k in addkeys:
+            op = NC_UPDATE_REQUEST
+            op_field = struct.pack("B", op)
+            packet = op_field + k
+            s.sendto(packet, (SERVER_IP, NC_PORT))
+
+        cachekeys = newkeys
+        hhkeys = []
+        hits = {}
+        hhhits = {}
+
+thread.start_new_thread(refresh_cache, ())
 ## Listen hot report
 #f = open(path_log, "w")
 while True:
@@ -61,9 +124,15 @@ while True:
 
     key_header = struct.unpack(">I", key_field[:4])[0]
     load = struct.unpack(">IIII", load_field)
+    avg_load = sum(load)/len(load)
 
-    counter = counter + 1
-    print "\tHot Item:", key_header, load
+    if key_field in cachekeys:
+        hits[key_field] = avg_load
+    else:
+        print "\tHot Item:", key_header, load
+        hhhits[key_field] =  avg_load
+        if key_field not in hhkeys:
+            hhkeys.append(key_field)
 
     #f.write(str(key_header) + ' ')
     #f.write(str(load) + ' ')
