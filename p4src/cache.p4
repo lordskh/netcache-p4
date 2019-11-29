@@ -125,6 +125,16 @@ table set_collision {
     //default_action: set_cache_valid_act;
 }
 
+action check_cache_exist2_act() {
+    register_read(nc_cache_md.cache_exist, cache_valid_reg, nc_cache_md.cache_index);
+}
+table check_cache_exist2 {
+    actions {
+        check_cache_exist2_act;
+    }
+    //default_action: check_cache_valid_act;
+}
+
 control process_cache {
     apply (check_cache_exist);
     if (nc_cache_md.cache_exist == 1) {

@@ -37,5 +37,6 @@ control process_key {
         apply (write_key_2);
         apply (write_key_3);
         apply (write_key_4);
+        apply (check_cache_exist2)
     }
 }
