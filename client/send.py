@@ -26,13 +26,21 @@ thread.start_new_thread(counting, ())
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 f = open(path_query, "r")
 interval = 1.0 / (query_rate + 1)
-for line in f.readlines():
-    line = line.split()
+lines = f.readlines();
+skip = False
+for l in range(len(lines)):
+    if(skip):
+        skip = False
+        continue
+    line = lines[l].split()
     op = line[0]
     key_header = int(line[1])
     key_body = line[2:]
 
-    op_field = struct.pack("B", NC_READ_REQUEST)
+    if op == 'get':
+        op_field = struct.pack("B", NC_READ_REQUEST)
+    if op == 'put':
+        op_field = struct.pack("B", NC_WRITE_REQUEST)
     key_field = ""
     if len_key < 4 + len(key_body):
         print("Keys too long, please regen")
@@ -44,7 +52,13 @@ for line in f.readlines():
     for i in range(len(key_body)):
         key_field += struct.pack("B", int(key_body[i], 16))
     packet = op_field + key_field
-
+    if op == 'put':
+        line = lines[l+1].split()
+        val_field = ""
+        for i in range(len(line)):
+            val_field += struct.pack("B", int(line[i], 16))
+        packet += val_field
+        skip = True
     s.sendto(packet, (SERVER_IP, NC_PORT))
     counter = counter + 1
     time.sleep(interval)
