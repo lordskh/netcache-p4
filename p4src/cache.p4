@@ -17,6 +17,13 @@ header_type nc_key_md_t {
 }
 metadata nc_key_md_t nc_key_md;
 
+header_type nc_cache_hit_t {
+    fields {
+        hits: 32;
+    }
+}
+metadata nc_cache_hit_t nc_cache_hit;
+
 register cache_exist_reg {
     width: 1;
     instance_count: NUM_CACHE;
@@ -38,6 +45,11 @@ register key_3_reg {
 }
 
 register key_4_reg {
+    width: 32;
+    instance_count: NUM_CACHE;
+}
+
+register cache_hits_reg {
     width: 32;
     instance_count: NUM_CACHE;
 }
@@ -83,6 +95,26 @@ table load_key {
 register cache_valid_reg {
     width: 1;
     instance_count: NUM_CACHE;
+}
+
+action cache_hit_act() {
+    register_read(nc_cache_hit.hits, cache_hits_reg, nc_cache_md.cache_index);
+    add_to_field(nc_cache_hit.hits, 1);
+    register_write(cache_hits_reg, nc_cache_md.cache_index, nc_cache_hit.hits);
+}
+table cache_hit {
+    actions {
+        cache_hit_act;
+    }
+}
+
+action clear_hits_act() {
+    register_write(cache_hits_reg, nc_cache_md.cache_index, 0);
+}
+table clear_hits {
+    actions {
+        clear_hits_act;
+    }
 }
 
 action check_cache_valid_act() {
@@ -155,6 +187,9 @@ control process_cache {
         if (nc_hdr.key_1 == nc_key_md.key_1 and nc_hdr.key_2 == nc_key_md.key_2 and nc_hdr.key_3 == nc_key_md.key_3 and nc_hdr.key_4 == nc_key_md.key_4) {
             if (nc_hdr.op == NC_READ_REQUEST) {
                 apply (check_cache_valid);
+                if (nc_cache_md.cache_valid == 1) {
+                    apply (cache_hit)
+                }
             }
             else if (nc_hdr.op == NC_UPDATE_REPLY) {
                 apply (set_cache_valid);
@@ -165,6 +200,10 @@ control process_cache {
             else if (nc_hdr.op == NC_REMOVE) {
                 apply (remove_cache);
                 apply (set_cache_invalid);
+                apply (clear_hits);
+            }
+            else if (nc_hdr.op == NC_CLEAR_HITS) {
+                apply (clear_hits);
             }
         }
         else {
