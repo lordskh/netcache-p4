@@ -5,6 +5,7 @@
 #define NC_READ_REQUEST     0
 #define NC_READ_REPLY       1
 #define NC_HOT_READ_REQUEST 2
+#define NC_CLEAR_HOT        3
 #define NC_WRITE_REQUEST    4
 #define NC_CLEAR_HITS       5
 #define NC_HITS_REQUEST     6
