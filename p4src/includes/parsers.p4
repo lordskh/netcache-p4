@@ -46,6 +46,7 @@ parser parse_nc_hdr {
         NC_WRITE_REQUEST: ingress;
         NC_REMOVE: ingress;
         NC_CLEAR_HITS: ingress;
+        NC_HITS_REQUEST: ingress;
         default: ingress;
     }
 }

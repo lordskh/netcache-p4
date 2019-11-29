@@ -180,6 +180,26 @@ table check_cache_exist2 {
     }
 }
 
+#define CONTROLLER_IP 0x0a000003
+action send_hits_act() {
+    modify_field (nc_hdr.op, NC_HOT_READ_REQUEST);
+    register_read(nc_cache_hit.hits, cache_hits_reg, nc_cache_md.cache_index);
+    add_header (nc_load);
+    add_to_field(ipv4.totalLen, 16);
+    add_to_field(udp.len, 16);
+    modify_field (nc_load.load_1, nc_cache_md.cache_index);
+    modify_field (nc_load.load_2, nc_cache_md.cache_index);
+    modify_field (nc_load.load_3, nc_cache_md.cache_index);
+    modify_field (nc_load.load_4, nc_cache_md.cache_index);
+    modify_field (ipv4.dstAddr, CONTROLLER_IP);
+}
+
+table send_hits {
+    actions {
+        send_hits_act;
+    }
+}
+
 control process_cache {
     apply (check_cache_exist);
     if (nc_cache_md.cache_exist == 1) {
@@ -204,6 +224,9 @@ control process_cache {
             }
             else if (nc_hdr.op == NC_CLEAR_HITS) {
                 apply (clear_hits);
+            }
+            else if (nc_hdr.op == NC_HITS_REQUEST) {
+                apply (send_hits);
             }
         }
         else {
