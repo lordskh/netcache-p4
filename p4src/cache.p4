@@ -105,6 +105,16 @@ table set_cache_valid {
     //default_action: set_cache_valid_act;
 }
 
+action set_cache_invalid_act() {
+    register_write(cache_valid_reg, nc_cache_md.cache_index, 1);
+}
+table set_cache_invalid {
+    actions {
+        set_cache_valid_act;
+    }
+    //default_action: set_cache_valid_act;
+}
+
 action set_cache_exist_act() {
     register_write(cache_exist_reg, nc_cache_md.cache_index, 1);
 }
@@ -145,6 +155,9 @@ control process_cache {
             }
             else if (nc_hdr.op == NC_UPDATE_REPLY) {
                 apply (set_cache_valid);
+            }
+            else if (nc_hdr.op == NC_WRITE_REQUEST) {
+                apply (set_cache_invalid);
             }
         }
         else {

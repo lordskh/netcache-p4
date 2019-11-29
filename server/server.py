@@ -66,7 +66,8 @@ s.bind((SERVER_IP, NC_PORT))
 while True:
     packet, addr = s.recvfrom(2048)
     op_field = packet[0]
-    key_field = packet[1:]
+    key_field = packet[1:1+len_key]
+    val_field = packet[1+len_key:]
 
     op = struct.unpack("B", op_field)[0]
     key_header = struct.unpack(">I", key_field[:4])[0]
@@ -78,6 +79,13 @@ while True:
         s.sendto(packet, (CLIENT_IP, NC_PORT))
         counter = counter + 1
     elif (op == NC_UPDATE_REQUEST):
+        op = NC_UPDATE_REPLY
+        op_field = struct.pack("B", op)
+        key_field, val_field = kv[key_header]
+        packet = op_field + key_field + val_field
+        s.sendto(packet, (CONTROLLER_IP, NC_PORT))
+    elif (op == NC_WRITE_REPLY):
+        kv[key_header] = val_field
         op = NC_UPDATE_REPLY
         op_field = struct.pack("B", op)
         key_field, val_field = kv[key_header]
