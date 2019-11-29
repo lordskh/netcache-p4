@@ -14,6 +14,11 @@ path_log = "controller_log.txt"
 len_key = 16
 len_val = 128
 
+cachekeys = []
+hhkeys = []
+hits = {}
+hhhits = {}
+
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind((CONTROLLER_IP, NC_PORT))
 
@@ -42,14 +47,10 @@ for line in f.readlines():
         key_field += struct.pack("B", key_body[i])
 
     packet = op_field + key_field
+    cachekeys.append(key_field)
     s.sendto(packet, (SERVER_IP, NC_PORT))
     time.sleep(0.001)
 f.close()
-
-cachekeys = []
-hhkeys = []
-hits = {}
-hhhits = {}
 
 def clear_hh():
     global cachekeys
