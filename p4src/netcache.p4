@@ -23,7 +23,7 @@ control egress {
         heavy_hitter();
     }
     else if (nc_hdr.op == NC_CLEAR_HOT) {
-        heavy_hitter();
+        clear_heavy();
     }
     apply (ethernet_set_mac);
 }

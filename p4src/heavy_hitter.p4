@@ -2823,28 +2823,26 @@ table clear_hot {
     }
 }
 
+control clear_heavy {
+	apply (clear_hot);
+}
 control heavy_hitter {
-    if (nc_hdr.op == NC_READ_REQUEST) {
-        if (standard_metadata.instance_type == 0) {
-            count_min();
-            if (nc_load_md.load_1 > HH_THRESHOLD) {
-                if (nc_load_md.load_2 > HH_THRESHOLD) {
-                    if (nc_load_md.load_3 > HH_THRESHOLD) {
-                        if (nc_load_md.load_4 > HH_THRESHOLD) {
-                            bloom_filter();
-                            if (hh_bf_md.bf_1 == 0 or hh_bf_md.bf_2 == 0 or hh_bf_md.bf_3 == 0){
-                                report_hot_step_1();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else {
-            report_hot_step_2();
-        }
-    }
-    else if (nc_hdr.op == NC_CLEAR_HOT) {
-        apply (clear_hot);
-    }
+	if (standard_metadata.instance_type == 0) {
+		count_min();
+		if (nc_load_md.load_1 > HH_THRESHOLD) {
+		    if (nc_load_md.load_2 > HH_THRESHOLD) {
+		        if (nc_load_md.load_3 > HH_THRESHOLD) {
+		            if (nc_load_md.load_4 > HH_THRESHOLD) {
+		                bloom_filter();
+		                if (hh_bf_md.bf_1 == 0 or hh_bf_md.bf_2 == 0 or hh_bf_md.bf_3 == 0){
+		                    report_hot_step_1();
+		                }
+		            }
+		        }
+		    }
+		}
+	}
+	else {
+		report_hot_step_2();
+	}
 }
