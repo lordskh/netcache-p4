@@ -84,7 +84,7 @@ while True:
         key_field, val_field = kv[key_header]
         packet = op_field + key_field + val_field
         s.sendto(packet, (CONTROLLER_IP, NC_PORT))
-    elif (op == NC_WRITE_REPLY):
+    elif (op == NC_WRITE_REQUEST):
         kv[key_header] = val_field
         op = NC_UPDATE_REPLY
         op_field = struct.pack("B", op)
