@@ -92,7 +92,6 @@ table check_cache_valid {
     actions {
         check_cache_valid_act;
     }
-    //default_action: check_cache_valid_act;
 }
 
 action set_cache_valid_act() {
@@ -102,17 +101,24 @@ table set_cache_valid {
     actions {
         set_cache_valid_act;
     }
-    //default_action: set_cache_valid_act;
 }
 
 action set_cache_invalid_act() {
-    register_write(cache_valid_reg, nc_cache_md.cache_index, 1);
+    register_write(cache_valid_reg, nc_cache_md.cache_index, 0);
 }
 table set_cache_invalid {
     actions {
         set_cache_valid_act;
     }
-    //default_action: set_cache_valid_act;
+}
+
+action remove_cache_act() {
+    register_write(cache_exist_reg, nc_cache_md.cache_index, 0);
+}
+table remove_cache {
+    actions {
+        remove_cache_act;
+    }
 }
 
 action set_cache_exist_act() {
@@ -122,7 +128,6 @@ table set_cache_exist {
     actions {
         set_cache_exist_act;
     }
-    //default_action: set_cache_valid_act;
 }
 
 action set_collision_act() {
@@ -132,7 +137,6 @@ table set_collision {
     actions {
         set_collision_act;
     }
-    //default_action: set_cache_valid_act;
 }
 
 action check_cache_exist2_act() {
@@ -142,7 +146,6 @@ table check_cache_exist2 {
     actions {
         check_cache_exist2_act;
     }
-    //default_action: check_cache_valid_act;
 }
 
 control process_cache {
@@ -157,6 +160,10 @@ control process_cache {
                 apply (set_cache_valid);
             }
             else if (nc_hdr.op == NC_WRITE_REQUEST) {
+                apply (set_cache_invalid);
+            }
+            else if (nc_hdr.op == NC_REMOVE) {
+                apply (remove_cache);
                 apply (set_cache_invalid);
             }
         }

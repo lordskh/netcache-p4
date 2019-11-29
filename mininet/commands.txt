@@ -6,6 +6,7 @@ table_set_default load_key load_key_act
 table_set_default set_collision set_collision_act
 table_set_default check_cache_exist2 check_cache_exist2_act
 table_set_default set_cache_invalid set_cache_invalid_act
+table_set_default remove_cache remove_cache_act
 
 table_add ipv4_route set_egress 10.0.0.1 => 1
 table_add ipv4_route set_egress 10.0.0.2 => 2
