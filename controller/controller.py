@@ -57,7 +57,7 @@ def clear_hh():
     global hits
     global hhhits
     while True:
-        time.sleep(1)
+        time.sleep(10)
         for k in hhkeys:
             try:
                 hits[k] += hhhits[k]
@@ -79,7 +79,7 @@ def refresh_cache():
     global hits
     global hhhits
     while True:
-        time.sleep(10.1)
+        time.sleep(11)
         for k in cachekeys:
             op = NC_HITS_REQUEST
             op_field = struct.pack("B", op)
