@@ -30,7 +30,7 @@ while True:
     counter = counter + 1
     # Ensuring the new value is sent back in the packet
     print ("Value sent back")
-    print (struct.unpack("B", packet[5:6])[0])
+    print (struct.unpack("B", packet[len_key+1:len_key+2])[0])
 
     #op = struct.unpack("B", packet[0])
     #key_header = struct.unpack(">I", packet[1:5])[0]

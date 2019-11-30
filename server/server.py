@@ -88,7 +88,7 @@ while True:
     elif (op == NC_WRITE_REQUEST):
         op = NC_WRITE_REPLY
         # update value
-        print("Update request is received")
+        print("Write request is received")
         # Update is KV store
         kv[key_header] = (key_field, val_field)
         # Send reply

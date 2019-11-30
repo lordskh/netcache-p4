@@ -9,7 +9,7 @@ NC_PORT = 8888
 CLIENT_IP = "10.0.0.1"
 SERVER_IP = "10.0.0.2"
 CONTROLLER_IP = "10.0.0.3"
-path_query = "query_write.txt"
+path_query = "query_test_write.txt"
 query_rate = 1000
 
 len_key = 4
@@ -41,9 +41,9 @@ for line in f.readlines():
         # print ("Set command found\n")
         op_field = struct.pack("B", NC_WRITE_REQUEST)
 
-    fake_field = ""
-    for i in range(len_key):
-        fake_field += struct.pack("B", 0)
+    # fake_field = ""
+    # for i in range(len_key):
+    #     fake_field += struct.pack("B", 0)
     key_field = struct.pack(">I", key_header)
     for i in range(len(key_body)):
         key_field += struct.pack("B", int(key_body[i], 16))
@@ -53,10 +53,10 @@ for line in f.readlines():
         for i in range(0, len_val):
             val_field += struct.pack("B", int('0x2', 16))
 
-        packet = op_field + fake_field + key_field + val_field
+        packet = op_field + key_field + val_field
 
     else:
-        packet = op_field + fake_field + key_field
+        packet = op_field + key_field
 
     s.sendto(packet, (SERVER_IP, NC_PORT))
     counter = counter + 1
