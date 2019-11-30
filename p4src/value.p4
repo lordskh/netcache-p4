@@ -112,12 +112,14 @@
             apply (read_value_##i##_3); \
             apply (read_value_##i##_4); \
         } \
-        else if (nc_hdr.op == NC_UPDATE_REPLY and nc_cache_md.cache_exist == 1) { \
+        else if ((nc_hdr.op == NC_UPDATE_REPLY or nc_hdr.op == NC_WRITE_REQUEST) and nc_cache_md.cache_exist == 1) { \
             apply (write_value_##i##_1); \
             apply (write_value_##i##_2); \
             apply (write_value_##i##_3); \
             apply (write_value_##i##_4); \
-            apply (remove_value_header_##i); \
+            if (nc_hdr.op == NC_UPDATE_REPLY) { \
+                apply (remove_value_header_##i); \
+            } \
         } \
     }
 

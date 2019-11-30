@@ -78,6 +78,7 @@ while True:
         packet = op_field + key_field + val_field
         s.sendto(packet, (CLIENT_IP, NC_PORT))
         counter = counter + 1
+
     elif (op == NC_UPDATE_REQUEST):
         op = NC_UPDATE_REPLY
         op_field = struct.pack("B", op)

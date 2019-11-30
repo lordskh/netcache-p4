@@ -48,6 +48,16 @@ table set_cache_valid {
     //default_action: set_cache_valid_act;
 }
 
+action set_cache_invalid_act() {
+    register_write(cache_valid_reg, nc_cache_md.cache_index, 0);
+}
+table set_cache_invalid {
+    actions {
+        set_cache_invalid_act;
+    }
+    //default_action: set_cache_invalid_act;
+}
+
 control process_cache {
     apply (check_cache_exist);
     if (nc_cache_md.cache_exist == 1) {
@@ -56,6 +66,14 @@ control process_cache {
         }
         else if (nc_hdr.op == NC_UPDATE_REPLY) {
             apply (set_cache_valid);
+        }
+        else if (nc_hdr.op == NC_WRITE_REQUEST) {
+            // apply (check_cache_valid);
+            // Invalidate cache
+            apply (set_cache_invalid);
+        }
+        else if (nc_hdr.op == NC_WRITE_REPLY) {
+           apply (check_cache_valid);
         }
     }
 }

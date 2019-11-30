@@ -12,7 +12,7 @@ CONTROLLER_IP = "10.0.0.3"
 path_query = "query_test_write.txt"
 query_rate = 1000
 
-len_key = 4
+len_key = 16
 len_val = 128   # length of value is 128 bytes
 
 counter = 0
