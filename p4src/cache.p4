@@ -193,7 +193,9 @@ action send_hits_act() {
     modify_field (nc_load.load_2, nc_cache_md.cache_index);
     modify_field (nc_load.load_3, nc_cache_md.cache_index);
     modify_field (nc_load.load_4, nc_cache_md.cache_index);
+    modify_field (ipv4.srcAddr, ipv4.dstAddr);
     modify_field (ipv4.dstAddr, CONTROLLER_IP);
+
 }
 
 table send_hits {

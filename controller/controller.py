@@ -86,9 +86,11 @@ def refresh_cache():
             op_field = struct.pack("B", op)
             packet = op_field + k
             s.sendto(packet, (SERVER_IP, NC_PORT))
-        while(len(hits) > len(cachekeys) + len(hhkeys)):
-            continue
-
+            time.sleep(.0001)
+        t0 = time.time()
+        t1 = time.time()
+        while (len(hits) < len(cachekeys) + len(hhkeys)) and ((t1 - t0) < 2.0):
+            t1 = time.time()
         newkeys = sorted(hits, key=hits.get, reverse=True)[:128]
         keepkeys = set(newkeys).intersection(set(cachekeys))
         removekeys = list(set(cachekeys).difference(keepkeys))
@@ -99,11 +101,13 @@ def refresh_cache():
             op_field = struct.pack("B", op)
             packet = op_field + k
             s.sendto(packet, (SERVER_IP, NC_PORT))
+            time.sleep(.0001)
         for k in addkeys:
             op = NC_UPDATE_REQUEST
             op_field = struct.pack("B", op)
             packet = op_field + k
             s.sendto(packet, (SERVER_IP, NC_PORT))
+            time.sleep(.0001)
 
         cachekeys = newkeys
         hhkeys = []
@@ -122,7 +126,6 @@ while True:
     op = struct.unpack("B", op_field)[0]
     if (op != NC_HOT_READ_REQUEST):
         continue
-
     key_header = struct.unpack(">I", key_field[:4])[0]
     load = struct.unpack(">IIII", load_field)
     avg_load = sum(load)/len(load)
