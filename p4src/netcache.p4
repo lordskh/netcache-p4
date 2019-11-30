@@ -11,9 +11,8 @@
 
 control ingress {
     process_cache();
-    process_key();
     process_value();
-
+    
     apply (ipv4_route);
 }
 

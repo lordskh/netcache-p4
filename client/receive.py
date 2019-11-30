@@ -11,7 +11,7 @@ SERVER_IP = "10.0.0.2"
 CONTROLLER_IP = "10.0.0.3"
 path_reply = "reply.txt"
 
-len_key = 4
+len_key = 16
 
 counter = 0
 def counting():
@@ -28,14 +28,10 @@ s.bind((CLIENT_IP, NC_PORT))
 while True:
     packet, addr = s.recvfrom(1024)
     counter = counter + 1
-    # Ensuring the new value is sent back in the packet
-    print (struct.unpack("B", packet[5:6])[0])
-
-    # Old commented code from repo
     #op = struct.unpack("B", packet[0])
     #key_header = struct.unpack(">I", packet[1:5])[0]
     #f.write(str(op) + ' ')
     #f.write(str(key_header) + '\n')
     #f.flush()
     #print counter
-#f.close()
+#f.close()    

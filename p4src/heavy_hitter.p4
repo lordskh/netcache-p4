@@ -11,7 +11,7 @@ header_type nc_load_md_t {
         index_2: 16;
         index_3: 16;
         index_4: 16;
-
+        
         load_1: 32;
         load_2: 32;
         load_3: 32;
@@ -124,7 +124,7 @@ header_type hh_bf_md_t {
         index_1: 16;
         index_2: 16;
         index_3: 16;
-
+    
         bf_1: 1;
         bf_2: 1;
         bf_3: 1;
@@ -229,7 +229,7 @@ control report_hot_step_1 {
 #define CONTROLLER_IP 0x0a000003
 action report_hot_act() {
     modify_field (nc_hdr.op, NC_HOT_READ_REQUEST);
-
+    
     add_header (nc_load);
     add_to_field(ipv4.totalLen, 16);
     add_to_field(udp.len, 16);
@@ -237,7 +237,7 @@ action report_hot_act() {
     modify_field (nc_load.load_2, nc_load_md.load_2);
     modify_field (nc_load.load_3, nc_load_md.load_3);
     modify_field (nc_load.load_4, nc_load_md.load_4);
-
+    
     modify_field (ipv4.dstAddr, CONTROLLER_IP);
 }
 
@@ -249,7 +249,7 @@ table report_hot {
 
 control report_hot_step_2 {
     apply (report_hot);
-}
+}   
 
 control heavy_hitter {
     if (standard_metadata.instance_type == 0) {
