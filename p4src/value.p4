@@ -9,6 +9,17 @@
     } \
     header nc_value_##i##_t nc_value_##i;
 
+#define HEADER_VALUEr(i) \
+    header_type nc_valuer_##i##_t { \
+        fields { \
+            valuer_##i##_1: 32; \
+            valuer_##i##_2: 32; \
+            valuer_##i##_3: 32; \
+            valuer_##i##_4: 32; \
+        } \
+    } \
+    header nc_valuer_##i##_t nc_valuer_##i;
+
 #define PARSER_VALUE(i, ip1) \
     parser parse_nc_value_##i { \
         extract (nc_value_##i); \
@@ -29,6 +40,7 @@
 
 #define ACTION_READ_VALUE_SLICE(i, j) \
     action read_value_##i##_##j##_act() { \
+	    modify_field(nc_valuer_##i.valuer_##i##_##j ,nc_value_##i.value_##i##_##j); \
         register_read(nc_value_##i.value_##i##_##j, value_##i##_##j##_reg, nc_cache_md.cache_index); \
     }
 
@@ -103,14 +115,31 @@
         } \
     }
 
+#define ACTION_INVALIDATE_CACHE(i) \
+    action invalidate_cache_##i##_act() { \
+        register_write(cache_valid_reg, nc_cache_md.cache_index, 0); \
+    }
+
+#define TABLE_INVALIDATE_CACHE(i) \
+    table invalidate_cache_##i { \
+        actions { \
+            invalidate_cache_##i##_act; \
+        } \
+    }
+
 #define CONTROL_PROCESS_VALUE(i) \
     control process_value_##i { \
-        if (nc_hdr.op == NC_READ_REQUEST and nc_cache_md.cache_valid == 1) { \
-            apply (add_value_header_##i); \
+        if ((nc_hdr.op == NC_READ_REQUEST and nc_cache_md.cache_valid == 1) or (nc_hdr.op == NC_WRITE_REPLY and nc_cache_md.cache_exist == 1)) { \
+            if (nc_hdr.op == NC_READ_REQUEST){ \
+                apply (add_value_header_##i); \
+            } \
             apply (read_value_##i##_1); \
             apply (read_value_##i##_2); \
             apply (read_value_##i##_3); \
             apply (read_value_##i##_4); \
+            if (nc_hdr.op == NC_WRITE_REPLY and (nc_value_##i.value_##i##_1 != nc_valuer_##i.valuer_##i##_1 or nc_value_##i.value_##i##_2 != nc_valuer_##i.valuer_##i##_2 or nc_value_##i.value_##i##_3 != nc_valuer_##i.valuer_##i##_3 or nc_value_##i.value_##i##_4 != nc_valuer_##i.valuer_##i##_4)) { \
+                apply (invalidate_cache_##i); \
+            } \
         } \
         else if ((nc_hdr.op == NC_UPDATE_REPLY or nc_hdr.op == NC_WRITE_REQUEST) and nc_cache_md.cache_exist == 1) { \
             apply (write_value_##i##_1); \
@@ -125,6 +154,7 @@
 
 #define HANDLE_VALUE(i, ip1) \
     HEADER_VALUE(i) \
+    HEADER_VALUEr(i) \
     PARSER_VALUE(i, ip1) \
     REGISTER_VALUE(i) \
     ACTION_READ_VALUE(i) \
@@ -135,7 +165,9 @@
     TABLE_WRITE_VALUE(i) \
     ACTION_REMOVE_VALUE_HEADER(i) \
     TABLE_REMOVE_VALUE_HEADER(i) \
-    CONTROL_PROCESS_VALUE(i)
+    CONTROL_PROCESS_VALUE(i) \
+    TABLE_INVALIDATE_CACHE(i) \
+    ACTION_INVALIDATE_CACHE(i)
 
 #define FINAL_PARSER(i) \
     parser parse_nc_value_##i { \

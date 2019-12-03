@@ -73,7 +73,8 @@ control process_cache {
             apply (set_cache_invalid);
         }
         else if (nc_hdr.op == NC_WRITE_REPLY) {
-           apply (check_cache_valid);
+           // apply (check_cache_valid);
+           apply (set_cache_valid);
         }
     }
 }
